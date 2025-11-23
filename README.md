@@ -1,4 +1,4 @@
-# Lost_and_Found_Management_System-Optional_Capstone
+# Lost and Found Management System
 CSIT 227 Group Optional, Capstone
 
 
@@ -12,15 +12,12 @@ Users may also try and request an item if it is lost.
 When they do so, they must include/answer a short form:
 
 Item Name: What is the item?
-
 Last Location: Where was the item last seen?
-
 Last Time Seen: When was the item last seen?
 
 They must then drop said item to the LOST & FOUND section(s) of the school.
 We suggest workers centralizing the LOST & FOUND.
 
-
 An item can be marked LOST or FOUND. When an item is LOST, it is displayed in the LOST section of the form. Otherwise, when it is FOUND, it is displayed in the FOUND section of the form.
 
-When LOST/FOUND is communicated, it is displayed that someone retrieved the object
+When an Item is LOST/FOUND a comprehensive list is displayed that details the item.
