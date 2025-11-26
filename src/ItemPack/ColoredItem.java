@@ -1,4 +1,5 @@
 package ItemPack;
 
-public class ColoredItem extends Item{
+public abstract class ColoredItem extends Item{
+    private String color;
 }
