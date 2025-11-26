@@ -6,4 +6,7 @@ public class Clothing extends ColoredItem implements Wearable{
     private String clothingMaterial;
     private String clothingBrand;
 
+    public String getMaterial(){
+        return clothingMaterial;
+    }
 }
