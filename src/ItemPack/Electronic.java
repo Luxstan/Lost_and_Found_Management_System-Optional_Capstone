@@ -21,4 +21,6 @@ public class Electronic extends ColoredItem{
     public String getElectronicType() {
         return electronicType;
     }
+
+    public String getColor(){return color;}
 }
