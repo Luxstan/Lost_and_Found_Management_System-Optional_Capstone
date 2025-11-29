@@ -1,4 +1,6 @@
 package ItemPack;
 
-public class ColoredItem extends Item{
+public abstract class ColoredItem extends Item{
+    protected String color;
+    public abstract String getColor();
 }
