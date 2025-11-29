@@ -40,6 +40,13 @@ public class LFForm extends JFrame {
             }
         });
 
+        finalButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
         //setup Panel
         setContentPane(mainPanel);
         setTitle("Login");

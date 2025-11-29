@@ -1,7 +1,7 @@
 import ItemPack.Item;
 
 public class User {
-    private String name;
+    private final String name;
     private final String id;
     private String contactNo;
     private String course;
@@ -9,8 +9,12 @@ public class User {
     private Item[] lostList;
     private Item[] foundList;
 
-    public User(String id){
+    public User(String name, String id, String contactNo, String course, int year){
+        this.name = name;
         this.id = id;
+        this.contactNo = contactNo;
+        this.course = course;
+        this.year = year;
     }
 
     //Methods
@@ -41,6 +45,18 @@ public class User {
 
     public int getYear() {
         return year;
+    }
+
+    public void setContactNo(String contactNo){
+        this.contactNo = contactNo;
+    }
+
+    public void setCourse(String course){
+        this.course = course;
+    }
+
+    public void setYear(int year){
+        this.year = year;
     }
 
 
