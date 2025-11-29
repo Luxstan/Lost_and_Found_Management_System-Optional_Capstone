@@ -1,13 +1,17 @@
 package ItemPack;
 
 public class Item {
+    private int itemID;
     private String itemName;
-    private String details;
+    private String details = "-";
     private String lastLocationSeen;
     private String foundBy;
     private boolean isClaimed;
     private boolean isFound;
 
+    public Item(String itemName){
+        this.itemName = itemName;
+    }
     public Item(){
 
     }
@@ -23,6 +27,14 @@ public class Item {
     }
 
     //Setters and Getters
+    public void setItemID(int itemID){
+        this.itemID = itemID;
+    }
+
+
+    public int getItemID(){
+        return itemID;
+    }
     public String getItemName() {
         return itemName;
     }
