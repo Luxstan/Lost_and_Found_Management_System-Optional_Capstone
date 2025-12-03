@@ -38,11 +38,10 @@ public class LFSystem {
         return;
     }
 
-    public Item reportItemLost(User a){
+    public Item reportItem(User a, String option){
         Item item = null;
         //inputs
         String input;
-        double d_input;
 
         do {
             System.out.println("WHICH ITEM TYPE FITS THE MOST:");
@@ -59,15 +58,17 @@ public class LFSystem {
             input = sc.nextLine();
             switch (input) {
                 case "1":
+                    String inWallet;
+                    double d_input;
                     System.out.println("CHOSEN ITEM TYPE: MONEY");
                     System.out.print("AMOUNT: ");
                     d_input = sc.nextDouble();
                     System.out.print("FOUND IN WALLET? Y/N: ");
                     sc.nextLine();
-                    input = sc.nextLine();
-                    if(input.equals("Y") || input.equals("y")){
+                    inWallet = sc.nextLine();
+                    if(inWallet.equals("Y") || inWallet.equals("y")){
                         item = new Money(d_input, true); //AMOUNT, inWALLET?
-                    } else if (input.equals("N") || input.equals("n")) {
+                    } else if (inWallet.equals("N") || inWallet.equals("n")) {
                         item = new Money(d_input, false); //AMOUNT, inWALLET?
                     }
                     else{
@@ -76,11 +77,19 @@ public class LFSystem {
 
                     break;
                 case "2":
+                    String ownerName, ownerID = "", docType;
                     System.out.println("CHOSEN ITEM TYPE: DOCUMENT");
-                    item = new Document();
+                    System.out.print("OWNER NAME [if illegible]: ");
+                    ownerName = sc.nextLine();
+                    System.out.print("OWNER'S ID [if illegible]: ");
+                    ownerID = sc.nextLine();
+                    System.out.print("DOCUMENT TYPE [ID, CERTIFICATES...]: ");
+                    docType = sc.nextLine();
+                    item = new Document(ownerName, ownerID, docType);
                     break;
                 case "3":
                     System.out.println("CHOSEN ITEM TYPE: ACCESSORY");
+
                     item = new Accessory();
                     break;
                 case "4":
@@ -115,20 +124,28 @@ public class LFSystem {
                     break;
             }
 
-            if(item != null){
-                a.addLostItem(item);
-                item.setItemID(item_id++);
-                System.out.println("ADDED AN ITEM");
+
+
+            if(option.equals("REPORT LOST")){
+                if(item != null){
+                    a.addLostItem(item);
+                    item.setItemID(item_id++);
+                    System.out.println("ADDED AN ITEM TO LOST LIST");
+                }
+            } else if (option.equals("REPORT FOUND")) {
+                if(item != null){
+                    a.addFoundItem(item);
+                    item.setItemID(item_id++);
+                    System.out.println("ADDED AN ITEM TO FOUND LIST");
+                }
             }
+            else{
+                System.out.println("ERROR OPTION IS WRONG");
+            }
+
             item = null;
         } while (!input.equals("X"));
-        return item;
-    }
-
-    public Item reportItemFound(User a){
-        Item item = new Item();
-        a.addFoundItem(item);
-        return item;
+        return null;
     }
 
     //TEST FOR THE SYSTEM'S PROCESS, u might be able to use code here and integrate it into the form!
@@ -253,19 +270,20 @@ public class LFSystem {
             switch(input){
                 case "1" :
                     System.out.println("YOU HAVE LOST AN ITEM AND WISH TO REPORT IT...");
-                    lostList.add(reportItemLost(user));
+                    lostList.add(reportItem(user, "REPORT LOST"));
                     break;
                 case "2":
                     System.out.println("YOU HAVE FOUND AN ITEM AND WISH TO REPORT IT...");
-                    lostList.add(reportItemFound(user));
+                    lostList.add(reportItem(user, "REPORT FOUND"));
                     break;
                 case "3":
                     System.out.println("DISPLAYING " + user_name + "'S ITEMS LOST...");
-                    user.displayLostList();
+                    user.displayList("LOST");
                     break;
                 case "4":
                     System.out.println("DISPLAYING " + user_name + "'S ITEMS FOUND...");
                     System.out.println("The items here are yet to be claimed");
+                    user.displayList("FOUND");
                     break;
                 case "5":
                     System.out.println("EXITING...");
