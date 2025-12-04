@@ -1,3 +1,4 @@
+import ItemPack.Document;
 import ItemPack.Item;
 import ItemPack.Money;
 import ItemPack.Wearable;
@@ -42,13 +43,28 @@ public class User {
         foundList.removeIf(a -> a.getItemName().equalsIgnoreCase(item_id));
     }
 
-    public void displayLostList(){
-        for(Item a : lostList){
-            System.out.println(a.getItemID() + " : " + a.getItemName());
-            if(a instanceof Money){
-                System.out.println("Amount: " + ((Money) a).getAmount());
-                System.out.println("In Wallet? : " + ((Money) a).getInWallet());
+    public void displayList(String option){
+        if(option.equals("LOST")){
+            for(Item a : lostList){
+                printItemDetails(a);
             }
+        } else if (option.equals("FOUND")) {
+            for(Item a : foundList){
+                printItemDetails(a);
+            }
+        }
+    }
+
+    private void printItemDetails(Item item){
+        System.out.println(item.getItemID() + " : " + item.getItemName());
+        if(item instanceof Money){
+            System.out.println("Amount: " + ((Money) item).getAmount());
+            System.out.println("In Wallet? : " + ((Money) item).getInWallet());
+        }
+        else if (item instanceof Document) {
+            System.out.println("Owner's Name: " + ((Document) item).getOwnerName());
+            System.out.println("Owner's ID: " + ((Document) item).getOwnerID());
+            System.out.println("Document Type: " + ((Document) item).getDocType());
         }
     }
 
