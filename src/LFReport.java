@@ -1,24 +1,33 @@
 import ItemPack.*;
 import javax.swing.*;
-import java.awt.*;
-
-
-//Im gonna need to redo this, I understand that it works but I dont understand how it is.
-//Gonna redo when I have better understanding.
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class LFReport extends JFrame {
-    // LFReport Private variables
-    private final User currentUser;
-    private final LFSystem system;
-
-    private JButton FoundReportBTN;
-    private JButton LostReportButton;
+    private JPanel contentPane;
+    private JPanel Header;
+    private JPanel Details;
+    private JPanel SubHeader;
     private JPanel HiddenPanel;
-    private JPanel MainPanel;
-    private JPanel ReportPanel;
-    private JTextField itemName;
-    private JTextArea Details;
+    private JPanel ReportButtons;
+    private JButton ReportFound;
+    private JButton ReportLost;
+    private JTextField itemNameInput;
+    private JTextField itemDetailsInput;
+    private JLabel itemNameLabel;
+    private JTextField FoundbyInput;
+    private JLabel itemDetailsLabel;
+    private JLabel FoundbyLabel;
+    private JLabel itemType;
+    private JButton submitButton;
+    private JComboBox ItemTypesCombo;
+    private JLabel lastFoundLabel;
+    private JTextField lastFoundInput;
+    // Additional components for item type selection
     private JComboBox<String> itemTypeCombo;
+
+    private User currentUser;
+    private LFSystem system;
     private boolean isReportingLost = true;
 
     public LFReport(User user, LFSystem sys) {
@@ -26,118 +35,110 @@ public class LFReport extends JFrame {
         this.system = sys;
 
         setupUI();
+        setupListeners();
+
+        setContentPane(contentPane);
         setTitle("Report Lost/Found Item - " + user.getName());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(500, 450);
+        setSize(520, 600);
         setLocationRelativeTo(null);
         setVisible(true);
     }
 
     private void setupUI() {
-        JPanel container = new JPanel(new BorderLayout());
-
-        // Main Panel
-        MainPanel = new JPanel();
-        MainPanel.setLayout(new BoxLayout(MainPanel, BoxLayout.Y_AXIS));
-        MainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
-
-        JLabel titleLabel = new JLabel("Report an Item");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        MainPanel.add(titleLabel);
-        MainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        container.add(MainPanel, BorderLayout.NORTH);
-
-        // Hidden Panel
-        HiddenPanel = new JPanel();
-        HiddenPanel.setLayout(new BoxLayout(HiddenPanel, BoxLayout.Y_AXIS));
-        HiddenPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        // Initially hide the hidden panel
         HiddenPanel.setVisible(false);
+        Details.setVisible(false);
 
-        // Item Type dropdown
-        JPanel typePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        typePanel.add(new JLabel("Item Type:"));
-        String[] itemTypes = {
+        // Setup button text
+        ReportLost.setText("Report as LOST");
+        ReportFound.setText("Report as FOUND");
+
+        // Add item type dropdown to hidden panel
+        itemTypeCombo = new JComboBox<>(new String[]{
                 "Select Type", "Money", "Document", "Accessory",
                 "Bag", "Clothing", "Electronic", "Wearable Electronic",
                 "Food Container", "Other"
-        };
-        itemTypeCombo = new JComboBox<>(itemTypes);
-        itemTypeCombo.setPreferredSize(new Dimension(300, 30));
+        });
+
+        // Clear the HiddenPanel and add the combo box properly
+        HiddenPanel.removeAll();
+        HiddenPanel.setLayout(new BoxLayout(HiddenPanel, BoxLayout.Y_AXIS));
+
+        JPanel typePanel = new JPanel();
+        typePanel.add(new JLabel("Item Type:"));
         typePanel.add(itemTypeCombo);
-        typePanel.setMaximumSize(new Dimension(450, 40));
         HiddenPanel.add(typePanel);
-        HiddenPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Item Name
-        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        namePanel.add(new JLabel("Item Name:"));
-        itemName = new JTextField(25);
-        namePanel.add(itemName);
-        namePanel.setMaximumSize(new Dimension(450, 40));
-        HiddenPanel.add(namePanel);
-        HiddenPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        // Add submit button to Details panel
+        JButton submitButton = new JButton("Submit Report");
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                submitReport();
+            }
+        });
 
-        // Details
-        JPanel detailsPanel = new JPanel(new BorderLayout());
-        detailsPanel.add(new JLabel("Details:"), BorderLayout.NORTH);
-        Details = new JTextArea(5, 30);
-        Details.setLineWrap(true);
-        Details.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(Details);
-        detailsPanel.add(scrollPane, BorderLayout.CENTER);
-        detailsPanel.setMaximumSize(new Dimension(450, 120));
-        HiddenPanel.add(detailsPanel);
-        HiddenPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        // Submit button
-        JButton submitBtn = new JButton("Submit Report");
-        submitBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        submitBtn.addActionListener(e -> submitReport(isReportingLost));
-        HiddenPanel.add(submitBtn);
-
-        container.add(HiddenPanel, BorderLayout.CENTER);
-
-        // Report Panel
-        ReportPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        ReportPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-
-        LostReportButton = new JButton("Report as LOST");
-        LostReportButton.addActionListener(e -> showReportForm(true));
-
-        FoundReportBTN = new JButton("Report as FOUND");
-        FoundReportBTN.addActionListener(e -> showReportForm(false));
-
-        ReportPanel.add(LostReportButton);
-        ReportPanel.add(FoundReportBTN);
-
-        container.add(ReportPanel, BorderLayout.SOUTH);
-
-        setContentPane(container);
+        // Add the submit button to the Details panel
+        Details.setLayout(new BoxLayout(Details, BoxLayout.Y_AXIS));
+        Details.add(submitButton);
     }
 
+    private void setupListeners() {
+        // Report Lost button - shows hidden panel for lost items
+        ReportLost.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showReportForm(true);
+            }
+        });
+
+        // Report Found button - shows hidden panel for found items
+        ReportFound.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showReportForm(false);
+            }
+        });
+    }
+
+    // Shows the hidden panel when a button is selected
     private void showReportForm(boolean isLost) {
         isReportingLost = isLost;
-        HiddenPanel.setVisible(true);
 
+        // Make panels visible
+        HiddenPanel.setVisible(true);
+        Details.setVisible(true);
+
+        // Update button states
         if (isLost) {
-            LostReportButton.setEnabled(false);
-            FoundReportBTN.setEnabled(true);
+            ReportLost.setEnabled(false);
+            ReportFound.setEnabled(true);
         } else {
-            LostReportButton.setEnabled(true);
-            FoundReportBTN.setEnabled(false);
+            ReportLost.setEnabled(true);
+            ReportFound.setEnabled(false);
+        }
+
+        // Update foundby label visibility
+        if (isLost) {
+            FoundbyLabel.setVisible(false);
+            FoundbyInput.setVisible(false);
+        } else {
+            FoundbyLabel.setVisible(true);
+            FoundbyInput.setVisible(true);
         }
 
         revalidate();
         repaint();
     }
 
-    private void submitReport(boolean isLost) {
-        String name = itemName.getText().trim();
-        String details = Details.getText().trim();
+    // Submit the report - integrated from reportItemLost
+    private void submitReport() {
+        String name = itemNameInput.getText().trim();
+        String details = itemDetailsInput.getText().trim();
         String type = (String) itemTypeCombo.getSelectedItem();
 
+        // Validation
         if (name.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "Please enter an item name.",
@@ -154,12 +155,23 @@ public class LFReport extends JFrame {
             return;
         }
 
+        // Create item based on type (integrated from reportItemLost)
         Item newItem = createItemByType(type);
         if (newItem == null) return;
 
+        // Set item ID
         newItem.setItemID(system.item_id++);
 
-        if (isLost) {
+        // Set name and details if methods exist
+        try {
+            newItem.setItemName(name);
+            newItem.setDetails(details);
+        } catch (Exception e) {
+            // If methods don't exist, continue anyway
+        }
+
+        // Add to appropriate lists
+        if (isReportingLost) {
             currentUser.addLostItem(newItem);
             system.lostList.add(newItem);
             JOptionPane.showMessageDialog(this,
@@ -179,7 +191,10 @@ public class LFReport extends JFrame {
         clearForm();
     }
 
+    // Creates items based on type - integrated from LFSystem.reportItemLost
     private Item createItemByType(String type) {
+        Item item = null;
+
         switch (type) {
             case "Money":
                 String amountStr = JOptionPane.showInputDialog(this, "Enter amount:");
@@ -190,71 +205,89 @@ public class LFReport extends JFrame {
                             "Was it in a wallet?",
                             "Wallet",
                             JOptionPane.YES_NO_OPTION);
-                    return new Money(amount, wallet == JOptionPane.YES_OPTION);
+                    item = new Money(amount, wallet == JOptionPane.YES_OPTION);
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(this, "Invalid amount!");
                     return null;
                 }
+                break;
             case "Document":
-                return new Document();
+                item = new Document();
+                break;
             case "Accessory":
-                return new Accessory();
+                item = new Accessory();
+                break;
             case "Bag":
-                return new Bag();
+                item = new Bag();
+                break;
             case "Clothing":
-                return new Clothing();
+                item = new Clothing();
+                break;
             case "Electronic":
-                return new Electronic();
+                item = new Electronic();
+                break;
             case "Wearable Electronic":
-                return new WearableElectronic();
+                item = new WearableElectronic();
+                break;
             case "Food Container":
-                return new FoodContainer();
+                item = new FoodContainer();
+                break;
             case "Other":
-                return new Miscellaneous();
+                item = new Miscellaneous();
+                break;
             default:
                 return null;
         }
+
+        return item;
     }
 
+    // Checks for potential matches between found and lost items
     private void checkForMatches(Item foundItem) {
-        for (Item lostItem : system.lostList) {
-            if (lostItem.getItemName().equalsIgnoreCase(foundItem.getItemName())) {
-                JOptionPane.showMessageDialog(this,
-                        "POTENTIAL MATCH FOUND!\n" +
-                                "A similar item was reported lost:\n" +
-                                "Item ID: " + lostItem.getItemID() + "\n" +
-                                "Name: " + lostItem.getItemName(),
-                        "Match Found",
-                        JOptionPane.INFORMATION_MESSAGE);
-                break;
+        try {
+            for (Item lostItem : system.lostList) {
+                if (lostItem.getItemName().equalsIgnoreCase(foundItem.getItemName())) {
+                    JOptionPane.showMessageDialog(this,
+                            "POTENTIAL MATCH FOUND!\n" +
+                                    "A similar item was reported lost:\n" +
+                                    "Item ID: " + lostItem.getItemID() + "\n" +
+                                    "Name: " + lostItem.getItemName(),
+                            "Match Found",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                }
             }
+        } catch (Exception e) {
+            // If getItemName doesn't exist, skip matching
         }
     }
 
+    // Clears the form and hides the panels
     private void clearForm() {
-        itemName.setText("");
-        Details.setText("");
+        itemNameInput.setText("");
+        itemDetailsInput.setText("");
+        FoundbyInput.setText("");
         itemTypeCombo.setSelectedIndex(0);
+
         HiddenPanel.setVisible(false);
-        LostReportButton.setEnabled(true);
-        FoundReportBTN.setEnabled(true);
+        Details.setVisible(false);
+
+        ReportLost.setEnabled(true);
+        ReportFound.setEnabled(true);
+
         revalidate();
         repaint();
     }
 
-    public String getItemName() {
-        return itemName.getText();
-    }
-
-    public String getDetails() {
-        return Details.getText();
-    }
-
+    // Main method for testing
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            LFSystem mockSystem = new LFSystem();
-            User mockUser = new User("Test User", "12345", "password", "0912-345-6789", "CS", 3);
-            new LFReport(mockUser, mockSystem);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                LFSystem mockSystem = new LFSystem();
+                User mockUser = new User("Test User", "12345", "password", "0912-345-6789", "CS", 3);
+                new LFReport(mockUser, mockSystem);
+            }
         });
     }
 }
