@@ -1,7 +1,4 @@
-import ItemPack.Document;
-import ItemPack.Item;
-import ItemPack.Money;
-import ItemPack.Wearable;
+import ItemPack.*;
 
 import java.util.ArrayList;
 
@@ -47,16 +44,20 @@ public class User {
         if(option.equals("LOST")){
             for(Item a : lostList){
                 printItemDetails(a);
+                System.out.println();
             }
         } else if (option.equals("FOUND")) {
             for(Item a : foundList){
                 printItemDetails(a);
+                System.out.println();
             }
         }
     }
 
     private void printItemDetails(Item item){
         System.out.println(item.getItemID() + " : " + item.getItemName());
+        System.out.println("Description: " + item.getDetails());
+        System.out.println("Last Location Seen: " + item.getLastLocationSeen());
         if(item instanceof Money){
             System.out.println("Amount: " + ((Money) item).getAmount());
             System.out.println("In Wallet? : " + ((Money) item).getInWallet());
@@ -66,6 +67,48 @@ public class User {
             System.out.println("Owner's ID: " + ((Document) item).getOwnerID());
             System.out.println("Document Type: " + ((Document) item).getDocType());
         }
+        else if (item instanceof Accessory) {
+            System.out.println("Material: " + ((Accessory) item).getMaterial());
+            System.out.println("Type: " + ((Accessory) item).getType());
+            System.out.println("Color: " + ((Accessory) item).getColor());
+        }
+        else if (item instanceof Bag) {
+            System.out.println("Brand: " + ((Bag) item).getBrand());
+            System.out.println("Material: " + ((Bag) item).getMaterial());
+            System.out.println("Type: " + ((Bag) item).getType());
+            System.out.println("Color: " + ((Bag) item).getColor());
+        }
+        else if (item instanceof Clothing) {
+            System.out.println("Size: " + ((Clothing) item).getSize());
+            System.out.println("Brand: " + ((Clothing) item).getBrand());
+            System.out.println("Material: " + ((Clothing) item).getMaterial());
+            System.out.println("Type: " + ((Clothing) item).getType());
+            System.out.println("Color: " + ((Clothing) item).getColor());
+        }
+        else if (item instanceof Electronic) {
+            System.out.println("Model: " + ((Electronic) item).getModel());
+            System.out.println("Brand: " + ((Electronic) item).getBrand());
+            System.out.println("Material: " + ((Electronic) item).getMaterial());
+            System.out.println("Type: " + ((Electronic) item).getType());
+            if(item instanceof WearableElectronic){
+                System.out.println("Electronic is a wearable type");
+            }
+            System.out.println("Color: " + ((Electronic) item).getColor());
+
+        }
+        else if (item instanceof FoodContainer) {
+            System.out.println("Capacity: " + ((FoodContainer) item).getCapacity());
+            System.out.println("Brand: " + ((FoodContainer) item).getBrand());
+            System.out.println("Type: " + ((FoodContainer) item).getType());
+            System.out.println("Color: " + ((FoodContainer) item).getColor());
+        }
+        else if (item instanceof Miscellaneous) {
+            System.out.println("Item is possibly: " + ((Miscellaneous) item).getItemCategory());
+        }
+        else{
+            System.out.println("INVALID ITEM TYPE INSIDE THE LIST!");
+        }
+
     }
 
 

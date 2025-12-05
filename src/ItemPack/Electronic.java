@@ -1,10 +1,18 @@
 package ItemPack;
 
 public class Electronic extends ColoredItem{
-    private String brand;
     private String model;
-    private String electronicMaterial;
-    private String electronicType;
+    private String brand;
+    private String material;
+    private String type;
+
+    public Electronic(String model, String brand, String material, String type, String color){
+        super.color = color;
+        this.model = model;
+        this.brand = brand;
+        this.material = material;
+        this.type = type;
+    }
 
     public String getBrand(){
         return brand;
@@ -14,12 +22,12 @@ public class Electronic extends ColoredItem{
         return model;
     }
 
-    public String getElectronicMaterial() {
-        return electronicMaterial;
+    public String getMaterial() {
+        return material;
     }
 
-    public String getElectronicType() {
-        return electronicType;
+    public String getType() {
+        return type;
     }
 
     public String getColor(){return color;}

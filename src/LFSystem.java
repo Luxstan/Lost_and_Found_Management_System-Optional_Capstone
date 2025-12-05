@@ -43,7 +43,18 @@ public class LFSystem {
         //inputs
         String input;
 
+        //General Fields shared across many items
+        String brand, material, type, color;
+
         do {
+            String name, description, location;
+            System.out.print("ITEM NAME: ");
+            name = sc.nextLine();
+            System.out.print("DESCRIBE THE ITEM: ");
+            description = sc.nextLine();
+            System.out.print("LAST LOCATION SEEN: ");
+            location = sc.nextLine();
+
             System.out.println("WHICH ITEM TYPE FITS THE MOST:");
             System.out.println("1 - MONEY");
             System.out.println("2 - DOCUMENT");
@@ -51,9 +62,8 @@ public class LFSystem {
             System.out.println("4 - BAG");
             System.out.println("5 - CLOTHING");
             System.out.println("6 - ELECTRONIC");
-            System.out.println("7 - WEARABLE ELECTRONIC");
-            System.out.println("8 - FOOD CONTAINER");
-            System.out.println("9 - OTHER");
+            System.out.println("7 - FOOD CONTAINER");
+            System.out.println("8 - OTHER");
             System.out.println("X - EXIT");
             input = sc.nextLine();
             switch (input) {
@@ -77,44 +87,98 @@ public class LFSystem {
 
                     break;
                 case "2":
-                    String ownerName, ownerID = "", docType;
+                    String ownerName, ownerID = "";
                     System.out.println("CHOSEN ITEM TYPE: DOCUMENT");
                     System.out.print("OWNER NAME [if illegible]: ");
                     ownerName = sc.nextLine();
                     System.out.print("OWNER'S ID [if illegible]: ");
                     ownerID = sc.nextLine();
                     System.out.print("DOCUMENT TYPE [ID, CERTIFICATES...]: ");
-                    docType = sc.nextLine();
-                    item = new Document(ownerName, ownerID, docType);
+                    type = sc.nextLine();
+                    item = new Document(ownerName, ownerID, type);
                     break;
                 case "3":
                     System.out.println("CHOSEN ITEM TYPE: ACCESSORY");
-
-                    item = new Accessory();
+                    System.out.print("MATERIAL: ");
+                    material = sc.nextLine();
+                    System.out.print("TYPE: ");
+                    type = sc.nextLine();
+                    System.out.print("COLOR: ");
+                    color = sc.nextLine();
+                    item = new Accessory(material, type, color);
                     break;
                 case "4":
                     System.out.println("CHOSEN ITEM TYPE: BAG");
-                    item = new Bag();
+                    System.out.print("BRAND: ");
+                    brand = sc.nextLine();
+                    System.out.print("MATERIAL: ");
+                    material = sc.nextLine();
+                    System.out.print("TYPE: ");
+                    type = sc.nextLine();
+                    System.out.print("COLOR: ");
+                    color = sc.nextLine();
+                    item = new Bag(brand, material, type, color);
                     break;
                 case "5":
+                    String size;
                     System.out.println("CHOSEN ITEM TYPE: CLOTHING");
-                    item = new Clothing();
+                    System.out.print("SIZE: ");
+                    size = sc.nextLine();
+                    System.out.print("BRAND: ");
+                    brand = sc.nextLine();
+                    System.out.print("MATERIAL: ");
+                    material = sc.nextLine();
+                    System.out.print("TYPE: ");
+                    type = sc.nextLine();
+                    System.out.print("COLOR: ");
+                    color = sc.nextLine();
+                    item = new Clothing(size, brand, material, type, color);
                     break;
                 case "6":
+                    String model, isWearable;
                     System.out.println("CHOSEN ITEM TYPE: ELECTRONIC");
-                    item = new Electronic();
+                    System.out.print("MODEL: ");
+                    model = sc.nextLine();
+                    System.out.print("BRAND: ");
+                    brand = sc.nextLine();
+                    System.out.print("MATERIAL: ");
+                    material = sc.nextLine();
+
+                    System.out.print("IS THIS GADGET WEARABLE? [Smart Watch, Headphones...] [Y/N]: ");
+                    isWearable = sc.nextLine();
+
+                    System.out.print("TYPE: ");
+                    type = sc.nextLine();
+                    System.out.print("COLOR: ");
+                    color = sc.nextLine();
+
+                    if(isWearable.equals("Y") || isWearable.equals("y")){
+                        item = new WearableElectronic(model, brand, material, type, color);
+                    }
+                    else if(isWearable.equals("N") || isWearable.equals("n")){
+                        item = new Electronic(model, brand, material, type, color);
+                    }
                     break;
                 case "7":
-                    System.out.println("CHOSEN ITEM TYPE: WEARABLE ELECTRONIC");
-                    item = new WearableElectronic();
+                    String capacity;
+                    System.out.println("CHOSEN ITEM TYPE: FOOD CONTAINER");
+                    System.out.print("CAPACITY: ");
+                    capacity = sc.nextLine();
+                    System.out.print("BRAND: ");
+                    brand = sc.nextLine();
+                    System.out.print("TYPE: ");
+                    type = sc.nextLine();
+                    System.out.print("COLOR: ");
+                    color = sc.nextLine();
+
+                    item = new FoodContainer(capacity, brand, type, color);
                     break;
                 case "8":
-                    System.out.println("CHOSEN ITEM TYPE: FOOD CONTAINER");
-                    item = new FoodContainer();
-                    break;
-                case "9":
                     System.out.println("CHOSEN ITEM TYPE: OTHER - MISCELLANEOUS");
-                    item = new Miscellaneous();
+                    String itemCat;
+                    System.out.print("WHAT ITEM CATEGORY DO YOU THINK THIS ITEM BELONGS IN: ");
+                    itemCat = sc.nextLine();
+                    item = new Miscellaneous(itemCat);
                     break;
                 case "X":
                     System.out.println("EXITING...");
@@ -123,27 +187,31 @@ public class LFSystem {
                     System.out.println("INVALID INPUT!");
                     break;
             }
+            if(item!=null){
+                item.setItemName(name);
+                item.setDetails(description);
+                item.setLastLocationSeen(location);
 
-
-
-            if(option.equals("REPORT LOST")){
-                if(item != null){
+                if(option.equals("REPORT LOST")){
                     a.addLostItem(item);
                     item.setItemID(item_id++);
                     System.out.println("ADDED AN ITEM TO LOST LIST");
-                }
-            } else if (option.equals("REPORT FOUND")) {
-                if(item != null){
+                } else if (option.equals("REPORT FOUND")) {
                     a.addFoundItem(item);
                     item.setItemID(item_id++);
                     System.out.println("ADDED AN ITEM TO FOUND LIST");
                 }
+                else{
+                    System.out.println("ERROR OPTION IS WRONG");
+                }
             }
-            else{
-                System.out.println("ERROR OPTION IS WRONG");
-            }
-
             item = null;
+
+            System.out.print("Do you wish to report another item? [Y/N]: ");
+            input = sc.nextLine();
+            if(input.equals("N")){
+                input = "X";
+            }
         } while (!input.equals("X"));
         return null;
     }

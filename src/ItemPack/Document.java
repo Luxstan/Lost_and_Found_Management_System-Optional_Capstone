@@ -3,13 +3,12 @@ package ItemPack;
 public class Document extends Item{
     private String ownerName;
     private String ownerID;
-    private String docType;
+    private String type;
 
     public Document(String ownerName, String ownerID, String docType){
-        super("Document");
         this.ownerName = ownerName;
         this.ownerID = ownerID;
-        this.docType = docType;
+        this.type = docType;
     }
 
     //Setters and Getters
@@ -21,8 +20,8 @@ public class Document extends Item{
         this.ownerID = ownerID;
     }
 
-    public void setDocType(String docType){
-        this.docType = docType;
+    public void setDocType(String type){
+        this.type = type;
     }
 
     public String getOwnerName(){
@@ -34,6 +33,6 @@ public class Document extends Item{
     }
 
     public String getDocType(){
-        return docType;
+        return type;
     }
 }

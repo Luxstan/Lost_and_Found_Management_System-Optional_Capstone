@@ -1,17 +1,19 @@
 package ItemPack;
 
 public class Accessory extends ColoredItem implements Wearable{
-    private String accessoryMaterial;
-    private String accessoryType;
+    private String material;
+    private String type;
 
-    //Setters and Getters
-    public String getAccessoryMaterial(){return accessoryMaterial;}
-    public String getAccessoryType(){return accessoryType;}
-
-    public String getColor(){return color;}
-    public String getMaterial(){
-        return accessoryMaterial;
+    public Accessory(String material, String type, String color){
+        super.color = color;
+        this.material = material;
+        this.type = type;
     }
 
-
+    //Setters and Getters
+    public String getColor(){return color;}
+    public String getMaterial(){
+        return material;
+    }
+    public String getType(){return type;}
 }

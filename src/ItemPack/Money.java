@@ -5,7 +5,6 @@ public class Money extends Item{
     private boolean inWallet;
 
     public Money(double amount, boolean inWallet){
-        super("Money");
         this.amount = amount;
         this.inWallet = inWallet;
     }
@@ -17,5 +16,13 @@ public class Money extends Item{
 
     public boolean getInWallet(){
         return inWallet;
+    }
+
+    public void setAmount(double amount){
+        this.amount = amount;
+    }
+
+    public void setInWallet(boolean inWallet){
+        this.inWallet = inWallet;
     }
 }

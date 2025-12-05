@@ -9,13 +9,6 @@ public class Item {
     private boolean isClaimed;
     private boolean isFound;
 
-    public Item(String itemName){
-        this.itemName = itemName;
-    }
-    public Item(){
-
-    }
-
     //Methods
     public void claim(){
         isClaimed = true;
@@ -30,7 +23,15 @@ public class Item {
     public void setItemID(int itemID){
         this.itemID = itemID;
     }
-
+    public void setItemName(String itemName){
+        this.itemName = itemName;
+    }
+    public void setDetails(String details){
+        this.details = details;
+    }
+    public void setLastLocationSeen(String lastLocationSeen){
+        this.lastLocationSeen = lastLocationSeen;
+    }
 
     public int getItemID(){
         return itemID;
