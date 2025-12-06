@@ -1,6 +1,7 @@
 import ErrorPack.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -35,18 +36,36 @@ public class LFForm extends JFrame {
     private JButton clearEntriesButton;
     private JPasswordField inputPassword;
     private JPanel lostItemsPage;
-    private JPanel findItemPage;
+    private JPanel reportAnItemPage;
     private JPanel profilePage;
     private JPanel messageTheOwnerPage;
     private JLabel logoIcon;
     private JPanel constantPanel;
     private JLabel constantBanner;
     private JButton profileButton;
-    private JButton findItemButton;
+    private JButton reportAnItemButton;
     private JButton lostItemsButton;
     private JPanel mainTabsHolder;
     private JLabel greetingsLabel;
     private JButton logoutButton;
+    private JPanel separatorHolder;
+    private JScrollPane scrolledItemsHolder;
+    private JPanel lostItemsHolder;
+    private JButton iLostButton;
+    private JButton iFoundAnItemButton;
+    private JLabel profileLabel;
+    private JPanel itemDetailsPage;
+
+    public static void start(JPanel inputDetails, JPanel lostItemsPage, JPanel reportAnItemPage, JPanel profilePage, JPanel constantPanel, JPanel messageTheOwnerPage, JPanel itemDetailsPage) {
+        inputDetails.setVisible(false);
+        lostItemsPage.setVisible(false);
+        reportAnItemPage.setVisible(false);
+        profilePage.setVisible(false);
+        constantPanel.setVisible(false);
+        messageTheOwnerPage.setVisible(false);
+        itemDetailsPage.setVisible(false);
+    }
+
 
     public static void goToLogin(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2) {
         holderPanel.setVisible(false);
@@ -67,7 +86,7 @@ public class LFForm extends JFrame {
         additionalRegistrationDetails2.setVisible(true);
     }
 
-    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user) {
+    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
         loginPage.setVisible(false);
         lostItemsPage.setVisible(true);
         findItemPage.setVisible(false);
@@ -79,14 +98,46 @@ public class LFForm extends JFrame {
         if(greetingsLabel.getText().equals("Change This")){
             greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
         }
+        markSelected(lostItemsButton);
+        markUnselected(reportAnItemButtonButton);
+        markUnselected(profileButton);
     }
 
-    public static void goToFindItem(JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage) {
+    public static void goToReportAnItem(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+        loginPage.setVisible(false);
         lostItemsPage.setVisible(false);
         findItemPage.setVisible(true);
         profilePage.setVisible(false);
         messageTheOwnerPage.setVisible(false);
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+        if(greetingsLabel.getText().equals("Change This")){
+            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
+        }
+        markUnselected(lostItemsButton);
+        markSelected(reportAnItemButtonButton);
+        markUnselected(profileButton);
     }
+
+    public static void goToProfile(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+        loginPage.setVisible(false);
+        lostItemsPage.setVisible(false);
+        findItemPage.setVisible(false);
+        profilePage.setVisible(true);
+        messageTheOwnerPage.setVisible(false);
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+        if(greetingsLabel.getText().equals("Change This")){
+            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
+        }
+        markUnselected(lostItemsButton);
+        markUnselected(reportAnItemButtonButton);
+        markSelected(profileButton);
+    }
+
+
 
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
     //CSV format: username,password,IDNumber,contactNumber,courseAndYear
@@ -94,83 +145,64 @@ public class LFForm extends JFrame {
     public static String[] findAccount(String findThis, String findThroughWhat){
         String[] currentIDNumber;
         String curr;
-        int findThrough = -1;
+        int findThrough = switch (findThroughWhat) {
+            case "Username" -> 0;
+            case "Password" -> 1;
+            case "ID Number" -> 2;
+            case "Contact Number" -> 3;
+            case "Course and Year" -> 4;
+            default -> -1;
+        };
 
-        try(BufferedReader br = new BufferedReader(new FileReader("records.csv"))){
-            //determine through which method to find record
-            switch (findThroughWhat) {
-                case "Username":
-                    findThrough = 0;
-                    break;
-                case  "Password":
-                    findThrough = 1;
-                    break;
-                case  "ID Number":
-                    findThrough = 2;
-                    break;
-                case "Contact Number":
-                    findThrough = 3;
-                    break;
-                case "Course and Year":
-                    findThrough = 4;
-                default:
-                    break;
-            }
+        if (findThrough == -1) return null;
 
-            while((curr = br.readLine()) != null){
+        try (BufferedReader br = new BufferedReader(new FileReader("records.csv"))) {
+            while ((curr = br.readLine()) != null) {
                 currentIDNumber = curr.split(",");
-                if(currentIDNumber[findThrough].equals(findThis)){
+                if (currentIDNumber.length > findThrough && currentIDNumber[findThrough].equals(findThis)) {
                     return currentIDNumber;
                 }
             }
-        } catch(IOException e){
-            //do nothing
-        }
+        } catch (IOException ignored) {}
         return null;
     }
 
     //Record new registered account using this function
     //CSV format would be username,password,IDNumber,contactNumber,courseAndYear
-    public static void recordAccount(String username, String password, String IDNumber, String contactNumber, String courseAndYear) throws EmptyField, InvalidIDFormat, InvalidNumberFormat, InvalidCourseAndYearFormat{
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter("records.csv",true))){
-            if(username.isEmpty()){
-                throw new EmptyField("Username");
-            }
-            if(password.isEmpty()){
-                throw new  EmptyField("Password");
-            }
-            if(!IDNumber.matches("^\\d{2}-\\d{4}-\\d{3}$")){
-                if(IDNumber.isEmpty()){
-                    throw new EmptyField("ID Number");
-                }
-                throw new InvalidIDFormat();
-            }
-            if(!contactNumber.matches("^09\\d{9}$")){
-                if(contactNumber.isEmpty()){
-                    throw new EmptyField("Contact Number");
-                }
-                throw new InvalidNumberFormat();
-            }
-            if(!courseAndYear.matches("^[A-Za-z0-9]{3,5}-\\d$")){
-                if(courseAndYear.isEmpty()){
-                    throw new EmptyField("Course and Year");
-                }
-                throw new InvalidCourseAndYearFormat();
-            }
-            bw.write(username+","+password+","+IDNumber+","+contactNumber+","+courseAndYear);
+    public static void recordAccount(String username, String password, String IDNumber, String contactNumber, String courseAndYear) throws EmptyField, InvalidIDFormat, InvalidNumberFormat, InvalidCourseAndYearFormat {
+        if (username.isEmpty()) throw new EmptyField("Username");
+        if (password.isEmpty()) throw new EmptyField("Password");
+        if (IDNumber.isEmpty()) throw new EmptyField("ID Number");
+        if (contactNumber.isEmpty()) throw new EmptyField("Contact Number");
+        if (courseAndYear.isEmpty()) throw new EmptyField("Course and Year");
+
+        if (!IDNumber.matches("^\\d{2}-\\d{4}-\\d{3}$")) throw new InvalidIDFormat();
+        if (!contactNumber.matches("^09\\d{9}$")) throw new InvalidNumberFormat();
+        if (!courseAndYear.matches("^[A-Za-z0-9]{3,5}-\\d$")) throw new InvalidCourseAndYearFormat();
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("records.csv", true))) {
+            bw.write(username + "," + password + "," + IDNumber + "," + contactNumber + "," + courseAndYear);
             bw.newLine();
-        } catch(IOException e){
-            //do nothing
-        }
+        } catch (IOException ignored) {}
     }
+
+    //tabs color changer
+    public static void markSelected(JButton a){
+        a.setBackground(Color.decode("#FFD700"));
+        a.setForeground(Color.decode("#800000"));
+        a.setOpaque(true);
+    }
+
+    public static void markUnselected(JButton a){
+        a.setBackground(Color.decode("#800000"));
+        a.setForeground(Color.white);
+        a.setOpaque(true);
+    }
+
 
     public LFForm() {
         //hide other panels not in use
-        inputDetails.setVisible(false);
-        lostItemsPage.setVisible(false);
-        findItemPage.setVisible(false);
-        profilePage.setVisible(false);
-        constantPanel.setVisible(false);
+        start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
 
         //add functionality to buttons
         //Selecting Login Button Pressed
@@ -222,7 +254,8 @@ public class LFForm extends JFrame {
                         case "Login":
                             if (onRecord!=null) {
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
-                                    goToLostItems(loginPage, lostItemsPage, findItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user);
+                                    goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+                                    clearEntriesButton.doClick();
                                 } else {
                                     throw new IncorrectPassword();
                                 }
@@ -255,7 +288,29 @@ public class LFForm extends JFrame {
 
         lostItemsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToLostItems(loginPage, lostItemsPage, findItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user);
+                goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+            }
+        });
+
+        reportAnItemButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                goToReportAnItem(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+            }
+        });
+
+        profileButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                goToProfile(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+            }
+        });
+
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                user = null;
+
+                start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
+                loginPage.setVisible(true);
+                holderPanel.setVisible(true);
             }
         });
 
