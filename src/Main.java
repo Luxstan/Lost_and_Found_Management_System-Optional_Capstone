@@ -9,11 +9,5 @@ public class Main {
                                 new LFForm();
                         }
                 });
-
-                //test program
-                LFSystem system = new LFSystem();
-                system.runSystem();
-
-
         }
 }
