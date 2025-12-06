@@ -7,6 +7,11 @@ import java.io.*;
 import java.util.Objects;
 
 public class LFForm extends JFrame {
+
+    //track current user
+    String[] user;
+
+    //swing things vv
     private JPanel mainPanel;
     private JPanel loginPage;
     private JButton selectRegisterButton;
@@ -29,6 +34,19 @@ public class LFForm extends JFrame {
     private JLabel courseAndYearLabel;
     private JButton clearEntriesButton;
     private JPasswordField inputPassword;
+    private JPanel lostItemsPage;
+    private JPanel findItemPage;
+    private JPanel profilePage;
+    private JPanel messageTheOwnerPage;
+    private JLabel logoIcon;
+    private JPanel constantPanel;
+    private JLabel constantBanner;
+    private JButton profileButton;
+    private JButton findItemButton;
+    private JButton lostItemsButton;
+    private JPanel mainTabsHolder;
+    private JLabel greetingsLabel;
+    private JButton logoutButton;
 
     public static void goToLogin(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2) {
         holderPanel.setVisible(false);
@@ -47,6 +65,27 @@ public class LFForm extends JFrame {
         redirectToOther.setText("Login?");
         additionalRegistrationDetails1.setVisible(true);
         additionalRegistrationDetails2.setVisible(true);
+    }
+
+    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user) {
+        loginPage.setVisible(false);
+        lostItemsPage.setVisible(true);
+        findItemPage.setVisible(false);
+        profilePage.setVisible(false);
+        messageTheOwnerPage.setVisible(false);
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+        if(greetingsLabel.getText().equals("Change This")){
+            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
+        }
+    }
+
+    public static void goToFindItem(JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage) {
+        lostItemsPage.setVisible(false);
+        findItemPage.setVisible(true);
+        profilePage.setVisible(false);
+        messageTheOwnerPage.setVisible(false);
     }
 
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
@@ -128,6 +167,10 @@ public class LFForm extends JFrame {
     public LFForm() {
         //hide other panels not in use
         inputDetails.setVisible(false);
+        lostItemsPage.setVisible(false);
+        findItemPage.setVisible(false);
+        profilePage.setVisible(false);
+        constantPanel.setVisible(false);
 
         //add functionality to buttons
         //Selecting Login Button Pressed
@@ -171,7 +214,7 @@ public class LFForm extends JFrame {
         finalButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String[] onRecord = findAccount(inputUsername.getText(),"Username");
+                    String[] onRecord = user = findAccount(inputUsername.getText(),"Username");
                     String enteredPassword = new String(inputPassword.getPassword());
                     //dependent on what the finalButton is displaying
                     switch (finalButton.getText()) {
@@ -179,7 +222,7 @@ public class LFForm extends JFrame {
                         case "Login":
                             if (onRecord!=null) {
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
-                                    JOptionPane.showMessageDialog(null, "Login Successful"); //temporary
+                                    goToLostItems(loginPage, lostItemsPage, findItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user);
                                 } else {
                                     throw new IncorrectPassword();
                                 }
@@ -197,7 +240,6 @@ public class LFForm extends JFrame {
                             } else {
                                 throw new AlreadyExists("Username",onRecord[0]);
                             }
-
                             recordAccount(inputUsername.getText(), enteredPassword, inputIDNumber.getText(), inputContactNumber.getText(), inputCourseAndYear.getText());
                             JOptionPane.showMessageDialog(null, "Registration Successful");
                             clearEntriesButton.doClick();
@@ -211,6 +253,12 @@ public class LFForm extends JFrame {
             }
         });
 
+        lostItemsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                goToLostItems(loginPage, lostItemsPage, findItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user);
+            }
+        });
+
         //setup Panel
         setContentPane(mainPanel);
         setTitle("Lost and Found Management System");
@@ -218,9 +266,13 @@ public class LFForm extends JFrame {
         setSize(520, 880);
         setLocationRelativeTo(null);
         setVisible(true);
+        logoIcon.setIcon(new ImageIcon("assets/logocit-1-300x212.png"));
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
+        logoutButton.setOpaque(false);
+        logoutButton.setContentAreaFilled(false);
+        logoutButton.setBorderPainted(false);
     }
 
 }
