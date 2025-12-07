@@ -4,6 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LFReport extends JFrame {
+
+    //Works for now.
+
+    //Header, Subheader, ReportButtons, and the labels are to be
+    //Customized for design, for now they do not serve a purpose.
+
+
     private JPanel contentPane;
     private JPanel Header;
     private JPanel Details;
@@ -22,12 +29,12 @@ public class LFReport extends JFrame {
     private JComboBox ItemTypesCombo;
     private JLabel lastFoundLabel;
     private JTextField lastFoundInput;
-    // Additional components for item type selection
-    private JComboBox<String> itemTypeCombo;
 
     private User currentUser;
     private LFSystem system;
-    private boolean isReportingLost = true;
+
+
+    //The login is not yet integrated to this.
 
     public LFReport(User user, LFSystem sys) {
         this.currentUser = user;
@@ -45,98 +52,64 @@ public class LFReport extends JFrame {
     }
 
     private void setupUI() {
-        // Initially hide the hidden panel
-        HiddenPanel.setVisible(false);
 
-        // Setup button text
-        ReportLost.setText("Report as LOST");
-        ReportFound.setText("Report as FOUND");
 
-        // Add item type dropdown to hidden panel
-        itemTypeCombo = new JComboBox<>(new String[]{
-                "Select Type", "Money", "Document", "Accessory",
-                "Bag", "Clothing", "Electronic", "Wearable Electronic",
-                "Food Container", "Other"
-        });
 
-        // Clear the HiddenPanel and add the combo box properly
-        HiddenPanel.removeAll();
-        HiddenPanel.setLayout(new BoxLayout(HiddenPanel, BoxLayout.Y_AXIS));
-
-        JPanel typePanel = new JPanel();
-        typePanel.add(new JLabel("Item Type:"));
-        typePanel.add(itemTypeCombo);
-        HiddenPanel.add(typePanel);
-
-        // Add submit button to Details panel
-        JButton submitButton = new JButton("Submit Report");
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                submitReport();
-            }
-        });
-
-        // Add the submit button to the Details panel
-        Details.setLayout(new BoxLayout(Details, BoxLayout.Y_AXIS));
-        Details.add(submitButton);
-    }
-
-    private void setupListeners() {
-        // Report Lost button - shows hidden panel for lost items
-        ReportLost.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showReportForm(true);
-            }
-        });
-
-        // Report Found button - shows hidden panel for found items
-        ReportFound.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showReportForm(false);
-            }
-        });
-    }
-
-    // Shows the hidden panel when a button is selected
-    private void showReportForm(boolean isLost) {
-        isReportingLost = isLost;
-
-        // Make panels visible
         HiddenPanel.setVisible(true);
         Details.setVisible(true);
 
-        // Update button states
-        if (isLost) {
-            ReportLost.setEnabled(false);
-            ReportFound.setEnabled(true);
-        } else {
-            ReportLost.setEnabled(true);
-            ReportFound.setEnabled(false);
-        }
+        // Set button text
+        ReportLost.setText("Report as LOST");
+        ReportFound.setText("Report as FOUND");
 
-        // Update foundby label visibility
-        if (isLost) {
-            FoundbyLabel.setVisible(false);
-            FoundbyInput.setVisible(false);
-        } else {
-            FoundbyLabel.setVisible(true);
-            FoundbyInput.setVisible(true);
-        }
 
-        revalidate();
-        repaint();
+        ItemTypesCombo.removeAllItems();
+        ItemTypesCombo.addItem("Select Type");
+        ItemTypesCombo.addItem("Money");
+        ItemTypesCombo.addItem("Document");
+        ItemTypesCombo.addItem("Accessory");
+        ItemTypesCombo.addItem("Bag");
+        ItemTypesCombo.addItem("Clothing");
+        ItemTypesCombo.addItem("Electronic");
+        ItemTypesCombo.addItem("Wearable Electronic");
+        ItemTypesCombo.addItem("Food Container");
+        ItemTypesCombo.addItem("Other");
+
+
+        // Initially hide Found By field
+        FoundbyLabel.setVisible(false);
+        FoundbyInput.setVisible(false);
     }
 
-    // Submit the report - integrated from reportItemLost
-    private void submitReport() {
+    //The report buttons, these are also submission.
+
+    private void setupListeners() {
+        ReportLost.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                submitReport(true);
+            }
+        });
+
+        ReportFound.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                submitReport(false);
+            }
+        });
+    }
+
+
+    //Submit report as either lost or found.
+
+    private void submitReport(boolean isReportingLost) {
         String name = itemNameInput.getText().trim();
         String details = itemDetailsInput.getText().trim();
-        String type = (String) itemTypeCombo.getSelectedItem();
+        String location = lastFoundInput.getText().trim();
+        String type = (String) ItemTypesCombo.getSelectedItem();
 
-        // Validation
+
+
         if (name.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "Please enter an item name.",
@@ -153,22 +126,14 @@ public class LFReport extends JFrame {
             return;
         }
 
-        // Create item based on type (integrated from reportItemLost)
         Item newItem = createItemByType(type);
         if (newItem == null) return;
 
-        // Set item ID
         newItem.setItemID(system.item_id++);
+        newItem.setItemName(name);
+        newItem.setDetails(details.isEmpty() ? "-" : details);
+        newItem.setLastLocationSeen(location.isEmpty() ? "-" : location);
 
-        // Set name and details if methods exist
-        try {
-            newItem.setItemName(name);
-            newItem.setDetails(details);
-        } catch (Exception e) {
-            // If methods don't exist, continue anyway
-        }
-
-        // Add to appropriate lists
         if (isReportingLost) {
             currentUser.addLostItem(newItem);
             system.lostList.add(newItem);
@@ -177,6 +142,10 @@ public class LFReport extends JFrame {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
         } else {
+            String foundBy = FoundbyInput.getText().trim();
+            if (!foundBy.isEmpty()) {
+                newItem.found(foundBy);
+            }
             currentUser.addFoundItem(newItem);
             system.foundList.add(newItem);
             checkForMatches(newItem);
@@ -189,7 +158,10 @@ public class LFReport extends JFrame {
         clearForm();
     }
 
-    // Creates items based on type - integrated from LFSystem.reportItemLost
+
+    //Based on the reportItem on the system file.
+    //Will create exceptions regarding these, probably.
+
     private Item createItemByType(String type) {
         Item item = null;
 
@@ -209,30 +181,113 @@ public class LFReport extends JFrame {
                     return null;
                 }
                 break;
+
             case "Document":
-                item = new Document();
+                String ownerName = JOptionPane.showInputDialog(this, "Owner Name (leave blank if illegible):");
+                String ownerID = JOptionPane.showInputDialog(this, "Owner ID (leave blank if illegible):");
+                String docType = JOptionPane.showInputDialog(this, "Document Type (ID, Certificate, etc.):");
+
+                ownerName = (ownerName == null || ownerName.trim().isEmpty()) ? "-" : ownerName;
+                ownerID = (ownerID == null || ownerID.trim().isEmpty()) ? "-" : ownerID;
+                docType = (docType == null || docType.trim().isEmpty()) ? "-" : docType;
+
+                item = new Document(ownerName, ownerID, docType);
                 break;
+
             case "Accessory":
-                item = new Accessory();
+                String accMaterial = JOptionPane.showInputDialog(this, "Material:");
+                String accType = JOptionPane.showInputDialog(this, "Type (ring, watch, etc.):");
+                String accColor = JOptionPane.showInputDialog(this, "Color:");
+
+                accMaterial = (accMaterial == null || accMaterial.trim().isEmpty()) ? "-" : accMaterial;
+                accType = (accType == null || accType.trim().isEmpty()) ? "-" : accType;
+                accColor = (accColor == null || accColor.trim().isEmpty()) ? "-" : accColor;
+
+                item = new Accessory(accMaterial, accType, accColor);
                 break;
+
             case "Bag":
-                item = new Bag();
+                String bagBrand = JOptionPane.showInputDialog(this, "Brand:");
+                String bagMaterial = JOptionPane.showInputDialog(this, "Material:");
+                String bagType = JOptionPane.showInputDialog(this, "Type (backpack, tote, etc.):");
+                String bagColor = JOptionPane.showInputDialog(this, "Color:");
+
+                bagBrand = (bagBrand == null || bagBrand.trim().isEmpty()) ? "-" : bagBrand;
+                bagMaterial = (bagMaterial == null || bagMaterial.trim().isEmpty()) ? "-" : bagMaterial;
+                bagType = (bagType == null || bagType.trim().isEmpty()) ? "-" : bagType;
+                bagColor = (bagColor == null || bagColor.trim().isEmpty()) ? "-" : bagColor;
+
+                item = new Bag(bagBrand, bagMaterial, bagType, bagColor);
                 break;
+
             case "Clothing":
-                item = new Clothing();
+                String size = JOptionPane.showInputDialog(this, "Size:");
+                String clothBrand = JOptionPane.showInputDialog(this, "Brand:");
+                String clothMaterial = JOptionPane.showInputDialog(this, "Material:");
+                String clothType = JOptionPane.showInputDialog(this, "Type (shirt, pants, etc.):");
+                String clothColor = JOptionPane.showInputDialog(this, "Color:");
+
+                size = (size == null || size.trim().isEmpty()) ? "-" : size;
+                clothBrand = (clothBrand == null || clothBrand.trim().isEmpty()) ? "-" : clothBrand;
+                clothMaterial = (clothMaterial == null || clothMaterial.trim().isEmpty()) ? "-" : clothMaterial;
+                clothType = (clothType == null || clothType.trim().isEmpty()) ? "-" : clothType;
+                clothColor = (clothColor == null || clothColor.trim().isEmpty()) ? "-" : clothColor;
+
+                item = new Clothing(size, clothBrand, clothMaterial, clothType, clothColor);
                 break;
+
             case "Electronic":
-                item = new Electronic();
+                String model = JOptionPane.showInputDialog(this, "Model:");
+                String elecBrand = JOptionPane.showInputDialog(this, "Brand:");
+                String elecMaterial = JOptionPane.showInputDialog(this, "Material:");
+                String elecType = JOptionPane.showInputDialog(this, "Type (phone, laptop, etc.):");
+                String elecColor = JOptionPane.showInputDialog(this, "Color:");
+
+                model = (model == null || model.trim().isEmpty()) ? "-" : model;
+                elecBrand = (elecBrand == null || elecBrand.trim().isEmpty()) ? "-" : elecBrand;
+                elecMaterial = (elecMaterial == null || elecMaterial.trim().isEmpty()) ? "-" : elecMaterial;
+                elecType = (elecType == null || elecType.trim().isEmpty()) ? "-" : elecType;
+                elecColor = (elecColor == null || elecColor.trim().isEmpty()) ? "-" : elecColor;
+
+                item = new Electronic(model, elecBrand, elecMaterial, elecType, elecColor);
                 break;
+
             case "Wearable Electronic":
-                item = new WearableElectronic();
+                String wModel = JOptionPane.showInputDialog(this, "Model:");
+                String wBrand = JOptionPane.showInputDialog(this, "Brand:");
+                String wMaterial = JOptionPane.showInputDialog(this, "Material:");
+                String wType = JOptionPane.showInputDialog(this, "Type (smartwatch, earbuds, etc.):");
+                String wColor = JOptionPane.showInputDialog(this, "Color:");
+
+                wModel = (wModel == null || wModel.trim().isEmpty()) ? "-" : wModel;
+                wBrand = (wBrand == null || wBrand.trim().isEmpty()) ? "-" : wBrand;
+                wMaterial = (wMaterial == null || wMaterial.trim().isEmpty()) ? "-" : wMaterial;
+                wType = (wType == null || wType.trim().isEmpty()) ? "-" : wType;
+                wColor = (wColor == null || wColor.trim().isEmpty()) ? "-" : wColor;
+
+                item = new WearableElectronic(wModel, wBrand, wMaterial, wType, wColor);
                 break;
+
             case "Food Container":
-                item = new FoodContainer();
+                String capacity = JOptionPane.showInputDialog(this, "Capacity:");
+                String fcBrand = JOptionPane.showInputDialog(this, "Brand:");
+                String fcType = JOptionPane.showInputDialog(this, "Type (tumbler, lunchbox, etc.):");
+                String fcColor = JOptionPane.showInputDialog(this, "Color:");
+
+                capacity = (capacity == null || capacity.trim().isEmpty()) ? "-" : capacity;
+                fcBrand = (fcBrand == null || fcBrand.trim().isEmpty()) ? "-" : fcBrand;
+                fcType = (fcType == null || fcType.trim().isEmpty()) ? "-" : fcType;
+                fcColor = (fcColor == null || fcColor.trim().isEmpty()) ? "-" : fcColor;
+
+                item = new FoodContainer(capacity, fcBrand, fcType, fcColor);
                 break;
+
             case "Other":
-                item = new Miscellaneous();
+                String itemCat = JOptionPane.showInputDialog(this, "Item Category:");
+                itemCat = (itemCat == null || itemCat.trim().isEmpty()) ? "-" : itemCat;
+                item = new Miscellaneous(itemCat);
                 break;
+
             default:
                 return null;
         }
@@ -240,44 +295,34 @@ public class LFReport extends JFrame {
         return item;
     }
 
-    // Checks for potential matches between found and lost items
     private void checkForMatches(Item foundItem) {
-        try {
-            for (Item lostItem : system.lostList) {
-                if (lostItem.getItemName().equalsIgnoreCase(foundItem.getItemName())) {
-                    JOptionPane.showMessageDialog(this,
-                            "POTENTIAL MATCH FOUND!\n" +
-                                    "A similar item was reported lost:\n" +
-                                    "Item ID: " + lostItem.getItemID() + "\n" +
-                                    "Name: " + lostItem.getItemName(),
-                            "Match Found",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    break;
-                }
+        for (Item lostItem : system.lostList) {
+            if (lostItem.getItemName().equalsIgnoreCase(foundItem.getItemName())) {
+                JOptionPane.showMessageDialog(this,
+                        "POTENTIAL MATCH FOUND!\n" +
+                                "A similar item was reported lost:\n" +
+                                "Item ID: " + lostItem.getItemID() + "\n" +
+                                "Name: " + lostItem.getItemName(),
+                        "Match Found",
+                        JOptionPane.INFORMATION_MESSAGE);
+                break;
             }
-        } catch (Exception e) {
-            // If getItemName doesn't exist, skip matching
         }
     }
 
-    // Clears the form and hides the panels
     private void clearForm() {
         itemNameInput.setText("");
         itemDetailsInput.setText("");
         FoundbyInput.setText("");
-        itemTypeCombo.setSelectedIndex(0);
-
-        HiddenPanel.setVisible(false);
-        Details.setVisible(false);
-
-        ReportLost.setEnabled(true);
-        ReportFound.setEnabled(true);
+        lastFoundInput.setText("");
+        ItemTypesCombo.setSelectedIndex(0);
 
         revalidate();
         repaint();
     }
 
-    // Main method for testing
+    //Mock login for now, not yet integrated with the login.
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
