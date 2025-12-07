@@ -55,6 +55,7 @@ public class LFForm extends JFrame {
     private JButton iFoundAnItemButton;
     private JLabel profileLabel;
     private JPanel itemDetailsPage;
+    private JPanel itemsHolder;
 
     public static void start(JPanel inputDetails, JPanel lostItemsPage, JPanel reportAnItemPage, JPanel profilePage, JPanel constantPanel, JPanel messageTheOwnerPage, JPanel itemDetailsPage) {
         inputDetails.setVisible(false);
@@ -86,7 +87,7 @@ public class LFForm extends JFrame {
         additionalRegistrationDetails2.setVisible(true);
     }
 
-    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton, JPanel itemsHolder) {
         loginPage.setVisible(false);
         lostItemsPage.setVisible(true);
         findItemPage.setVisible(false);
@@ -101,7 +102,42 @@ public class LFForm extends JFrame {
         markSelected(lostItemsButton);
         markUnselected(reportAnItemButtonButton);
         markUnselected(profileButton);
+
+        try (BufferedReader br = new BufferedReader(new FileReader("Items.csv"))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+
+                // Create an item panel for each record
+                JPanel itemPanel = createItemPanel(data);
+
+                // Add to grid
+                itemsHolder.add(itemPanel);
+            }
+
+        } catch (IOException e) {
+            //do nothing
+        }
+
     }
+    //create individual items
+    private static JPanel createItemPanel(String[] data) {
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(200, 120));//change size if boxes too small/big
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        // Example fields (adjust once you finalize CSV format)
+        JLabel name = new JLabel("Item: " + data[0]);
+        JLabel location = new JLabel("Location: " + (data.length > 1 ? data[1] : "N/A")); //change accordingly to final csv format
+
+        panel.add(name);
+        panel.add(location);
+
+        return panel;
+    }
+
 
     public static void goToReportAnItem(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
         loginPage.setVisible(false);
@@ -254,7 +290,7 @@ public class LFForm extends JFrame {
                         case "Login":
                             if (onRecord!=null) {
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
-                                    goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+                                    goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
                                     clearEntriesButton.doClick();
                                 } else {
                                     throw new IncorrectPassword();
@@ -288,7 +324,7 @@ public class LFForm extends JFrame {
 
         lostItemsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+                goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
             }
         });
 
@@ -328,6 +364,7 @@ public class LFForm extends JFrame {
         logoutButton.setOpaque(false);
         logoutButton.setContentAreaFilled(false);
         logoutButton.setBorderPainted(false);
+        itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
     }
 
 }
