@@ -67,7 +67,6 @@ public class LFForm extends JFrame {
         itemDetailsPage.setVisible(false);
     }
 
-
     public static void goToLogin(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2) {
         holderPanel.setVisible(false);
         inputDetails.setVisible(true);
@@ -352,12 +351,14 @@ public class LFForm extends JFrame {
 
         //setup Panel
         setContentPane(mainPanel);
+        //Instantly sets the form as the log-in page
+        goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
         setTitle("Lost and Found Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(520, 880);
+        setSize(520, 780);
         setLocationRelativeTo(null);
         setVisible(true);
-        logoIcon.setIcon(new ImageIcon("assets/logocit-1-300x212.png"));
+        logoIcon.setIcon(new ImageIcon("assets/cit_logo.png")); //300x212 dimensions
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
@@ -365,6 +366,9 @@ public class LFForm extends JFrame {
         logoutButton.setContentAreaFilled(false);
         logoutButton.setBorderPainted(false);
         itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
+
+        //Set up properties of certain fields beforehand
+        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [i'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
     }
 
 }
