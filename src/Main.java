@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.util.*;
 
 public class Main {
         public static void main(String[] args) {
@@ -9,11 +8,5 @@ public class Main {
                                 new LFForm();
                         }
                 });
-
-                //test program
-                LFSystem system = new LFSystem();
-                system.runSystem();
-
-
         }
 }

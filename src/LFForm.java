@@ -1,13 +1,18 @@
-import ErrorPack.IDNotFound;
-import ErrorPack.IncorrectPassword;
-import ErrorPack.InvalidIDFormat;
+import ErrorPack.*;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Objects;
 
 public class LFForm extends JFrame {
+
+    //track current user
+    String[] user;
+
+    //swing things vv
     private JPanel mainPanel;
     private JPanel loginPage;
     private JButton selectRegisterButton;
@@ -18,81 +23,258 @@ public class LFForm extends JFrame {
     private JPanel passwordPanel;
     private JLabel titleSelected;
     private JButton finalButton;
-    private JTextField inputPassword;
-    private JTextField inputID;
+    private JTextField inputUsername;
     private JButton redirectToOther;
+    private JPanel additionalRegistrationDetails2;
+    private JPanel additionalRegistrationDetails1;
+    private JTextField inputIDNumber;
+    private JLabel studentIDLabel;
+    private JTextField inputContactNumber;
+    private JTextField inputCourseAndYear;
+    private JLabel contactNumberLabel;
+    private JLabel courseAndYearLabel;
+    private JButton clearEntriesButton;
+    private JPasswordField inputPassword;
+    private JPanel lostItemsPage;
+    private JPanel reportAnItemPage;
+    private JPanel profilePage;
+    private JPanel messageTheOwnerPage;
+    private JLabel logoIcon;
+    private JPanel constantPanel;
+    private JLabel constantBanner;
+    private JButton profileButton;
+    private JButton reportAnItemButton;
+    private JButton lostItemsButton;
+    private JPanel mainTabsHolder;
+    private JLabel greetingsLabel;
+    private JButton logoutButton;
+    private JPanel separatorHolder;
+    private JScrollPane scrolledItemsHolder;
+    private JPanel lostItemsHolder;
+    private JButton iLostButton;
+    private JButton iFoundAnItemButton;
+    private JLabel profileLabel;
+    private JPanel itemDetailsPage;
+    private JPanel itemsHolder;
 
-    public static void goToLogin(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther) {
+    public static void start(JPanel inputDetails, JPanel lostItemsPage, JPanel reportAnItemPage, JPanel profilePage, JPanel constantPanel, JPanel messageTheOwnerPage, JPanel itemDetailsPage) {
+        inputDetails.setVisible(false);
+        lostItemsPage.setVisible(false);
+        reportAnItemPage.setVisible(false);
+        profilePage.setVisible(false);
+        constantPanel.setVisible(false);
+        messageTheOwnerPage.setVisible(false);
+        itemDetailsPage.setVisible(false);
+    }
+
+
+    public static void goToLogin(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2) {
         holderPanel.setVisible(false);
         inputDetails.setVisible(true);
         titleSelected.setText("Login");
         finalButton.setText("Login");
         redirectToOther.setText("Register?");
+        additionalRegistrationDetails1.setVisible(false);
+        additionalRegistrationDetails2.setVisible(false);
     }
-    public static void goToRegister(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther){
+    public static void goToRegister(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2){
         holderPanel.setVisible(false);
         inputDetails.setVisible(true);
         titleSelected.setText("Register");
         finalButton.setText("Register");
         redirectToOther.setText("Login?");
+        additionalRegistrationDetails1.setVisible(true);
+        additionalRegistrationDetails2.setVisible(true);
     }
 
-    //Find user's inputted IDNumber if it exists and return password to be used in validating
-    public static String findIDNumber(String idNumber){
-        String[] currentIDNumber;
-        String curr;
-        try(BufferedReader br = new BufferedReader(new FileReader("records.csv"))){
-            while((curr = br.readLine()) != null){
-                currentIDNumber = curr.split(",");
-                if(currentIDNumber[0].equals(idNumber)){
-                    return currentIDNumber[1];
-                }
+    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton, JPanel itemsHolder) {
+        loginPage.setVisible(false);
+        lostItemsPage.setVisible(true);
+        findItemPage.setVisible(false);
+        profilePage.setVisible(false);
+        messageTheOwnerPage.setVisible(false);
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+        if(greetingsLabel.getText().equals("Change This")){
+            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
+        }
+        markSelected(lostItemsButton);
+        markUnselected(reportAnItemButtonButton);
+        markUnselected(profileButton);
+
+        try (BufferedReader br = new BufferedReader(new FileReader("Items.csv"))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+
+                // Create an item panel for each record
+                JPanel itemPanel = createItemPanel(data);
+
+                // Add to grid
+                itemsHolder.add(itemPanel);
             }
-        } catch(IOException e){
+
+        } catch (IOException e) {
             //do nothing
         }
-        return "";
+
+    }
+    //create individual items
+    private static JPanel createItemPanel(String[] data) {
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(200, 120));//change size if boxes too small/big
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        // Example fields (adjust once you finalize CSV format)
+        JLabel name = new JLabel("Item: " + data[0]);
+        JLabel location = new JLabel("Location: " + (data.length > 1 ? data[1] : "N/A")); //change accordingly to final csv format
+
+        panel.add(name);
+        panel.add(location);
+
+        return panel;
+    }
+
+
+    public static void goToReportAnItem(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+        loginPage.setVisible(false);
+        lostItemsPage.setVisible(false);
+        findItemPage.setVisible(true);
+        profilePage.setVisible(false);
+        messageTheOwnerPage.setVisible(false);
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+        if(greetingsLabel.getText().equals("Change This")){
+            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
+        }
+        markUnselected(lostItemsButton);
+        markSelected(reportAnItemButtonButton);
+        markUnselected(profileButton);
+    }
+
+    public static void goToProfile(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+        loginPage.setVisible(false);
+        lostItemsPage.setVisible(false);
+        findItemPage.setVisible(false);
+        profilePage.setVisible(true);
+        messageTheOwnerPage.setVisible(false);
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+        if(greetingsLabel.getText().equals("Change This")){
+            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
+        }
+        markUnselected(lostItemsButton);
+        markUnselected(reportAnItemButtonButton);
+        markSelected(profileButton);
+    }
+
+
+
+    //Find user's account through inputted username/studentID if it exists and return password to be used in validating
+    //CSV format: username,password,IDNumber,contactNumber,courseAndYear
+    //indices:      [0]      [1]       [2]        [3]          [4]
+    public static String[] findAccount(String findThis, String findThroughWhat){
+        String[] currentIDNumber;
+        String curr;
+        int findThrough = switch (findThroughWhat) {
+            case "Username" -> 0;
+            case "Password" -> 1;
+            case "ID Number" -> 2;
+            case "Contact Number" -> 3;
+            case "Course and Year" -> 4;
+            default -> -1;
+        };
+
+        if (findThrough == -1) return null;
+
+        try (BufferedReader br = new BufferedReader(new FileReader("records.csv"))) {
+            while ((curr = br.readLine()) != null) {
+                currentIDNumber = curr.split(",");
+                if (currentIDNumber.length > findThrough && currentIDNumber[findThrough].equals(findThis)) {
+                    return currentIDNumber;
+                }
+            }
+        } catch (IOException ignored) {}
+        return null;
     }
 
     //Record new registered account using this function
-    public static void recordAccount(String IDNumber, String password) throws InvalidIDFormat{
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter("records.csv",true))){
-            if(!IDNumber.matches("^\\d{2}-\\d{4}-\\d{3}$")){
-                throw new InvalidIDFormat();
-            }
-            bw.write(IDNumber+","+password);
+    //CSV format would be username,password,IDNumber,contactNumber,courseAndYear
+    public static void recordAccount(String username, String password, String IDNumber, String contactNumber, String courseAndYear) throws EmptyField, InvalidIDFormat, InvalidNumberFormat, InvalidCourseAndYearFormat {
+        if (username.isEmpty()) throw new EmptyField("Username");
+        if (password.isEmpty()) throw new EmptyField("Password");
+        if (IDNumber.isEmpty()) throw new EmptyField("ID Number");
+        if (contactNumber.isEmpty()) throw new EmptyField("Contact Number");
+        if (courseAndYear.isEmpty()) throw new EmptyField("Course and Year");
+
+        if (!IDNumber.matches("^\\d{2}-\\d{4}-\\d{3}$")) throw new InvalidIDFormat();
+        if (!contactNumber.matches("^09\\d{9}$")) throw new InvalidNumberFormat();
+        if (!courseAndYear.matches("^[A-Za-z0-9]{3,5}-\\d$")) throw new InvalidCourseAndYearFormat();
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("records.csv", true))) {
+            bw.write(username + "," + password + "," + IDNumber + "," + contactNumber + "," + courseAndYear);
             bw.newLine();
-        } catch(IOException e){
-            //do nothing
-        }
+        } catch (IOException ignored) {}
     }
+
+    //tabs color changer
+    public static void markSelected(JButton a){
+        a.setBackground(Color.decode("#FFD700"));
+        a.setForeground(Color.decode("#800000"));
+        a.setOpaque(true);
+    }
+
+    public static void markUnselected(JButton a){
+        a.setBackground(Color.decode("#800000"));
+        a.setForeground(Color.white);
+        a.setOpaque(true);
+    }
+
 
     public LFForm() {
         //hide other panels not in use
-        inputDetails.setVisible(false);
+        start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
 
         //add functionality to buttons
         //Selecting Login Button Pressed
         selectLoginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther);
+                goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
             }
         });
 
         //Selecting Register Button Pressed
         selectRegisterButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToRegister(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther);
+                goToRegister(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther,  additionalRegistrationDetails1, additionalRegistrationDetails2);
             }
         });
 
         redirectToOther.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(titleSelected.getText().equals("Login")){
-                    goToRegister(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther);
+                    goToRegister(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
                 } else if(titleSelected.getText().equals("Register")){
-                    goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther);
+                    clearEntriesButton.doClick();
+                    goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
                 }
+            }
+        });
+
+        //Clearing Entries
+        clearEntriesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                inputUsername.setText("");
+                inputContactNumber.setText("");
+                inputIDNumber.setText("");
+                inputPassword.setText("");
+                inputContactNumber.setText("");
+                inputCourseAndYear.setText("");
             }
         });
 
@@ -100,40 +282,71 @@ public class LFForm extends JFrame {
         finalButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    String onRecord = findIDNumber(inputID.getText());
+                    String[] onRecord = user = findAccount(inputUsername.getText(),"Username");
+                    String enteredPassword = new String(inputPassword.getPassword());
+                    //dependent on what the finalButton is displaying
                     switch (finalButton.getText()) {
                         //LOGGING IN WITH USERNAME AND PASSWORD
                         case "Login":
-                            if (!Objects.equals(onRecord, "")) {
-                                if (Objects.equals(inputPassword.getText(), onRecord)) {
-                                    JOptionPane.showMessageDialog(null, "Login Successful"); //temporary
+                            if (onRecord!=null) {
+                                if (Objects.equals(enteredPassword, onRecord[1])) {
+                                    goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
+                                    clearEntriesButton.doClick();
                                 } else {
                                     throw new IncorrectPassword();
                                 }
                             } else {
-                                throw new IDNotFound();
+                                throw new UsernameNotFound();
                             }
                             break;
                         //REGISTERING NEW ACCOUNT
                         case "Register":
-                            recordAccount(inputID.getText(), inputPassword.getText());
+                            if(onRecord==null) {
+                                onRecord = findAccount(inputIDNumber.getText(),"ID Number");
+                                if(onRecord!=null) {
+                                    throw new AlreadyExists("ID Number", onRecord[2]);
+                                }
+                            } else {
+                                throw new AlreadyExists("Username",onRecord[0]);
+                            }
+                            recordAccount(inputUsername.getText(), enteredPassword, inputIDNumber.getText(), inputContactNumber.getText(), inputCourseAndYear.getText());
+                            JOptionPane.showMessageDialog(null, "Registration Successful");
+                            clearEntriesButton.doClick();
                             break;
                         default:
-                            JOptionPane.showMessageDialog(null, "Error. Redirecting to Login and Registration page.");
+                            JOptionPane.showMessageDialog(null, "Error. Try again.");
                     }
-                } catch (IDNotFound | IncorrectPassword | InvalidIDFormat f) {
+                } catch(AlreadyExists | EmptyField | UsernameNotFound | IncorrectPassword | InvalidIDFormat | InvalidNumberFormat | InvalidCourseAndYearFormat f){
                     JOptionPane.showMessageDialog(null, f.getMessage());
-                } finally {
-                    inputID.setText("");
-                    inputPassword.setText("");
                 }
             }
         });
 
-        finalButton.addActionListener(new ActionListener() {
-            @Override
+        lostItemsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
+            }
+        });
 
+        reportAnItemButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                goToReportAnItem(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+            }
+        });
+
+        profileButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                goToProfile(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+            }
+        });
+
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                user = null;
+
+                start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
+                loginPage.setVisible(true);
+                holderPanel.setVisible(true);
             }
         });
 
@@ -144,9 +357,14 @@ public class LFForm extends JFrame {
         setSize(520, 880);
         setLocationRelativeTo(null);
         setVisible(true);
+        logoIcon.setIcon(new ImageIcon("assets/logocit-1-300x212.png"));
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
+        logoutButton.setOpaque(false);
+        logoutButton.setContentAreaFilled(false);
+        logoutButton.setBorderPainted(false);
+        itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
     }
 
 }
