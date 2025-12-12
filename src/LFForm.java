@@ -9,33 +9,49 @@ import java.util.Objects;
 
 public class LFForm extends JFrame {
 
+    //LFSystem
+    LFSystem system = new LFSystem();
+
     //track current user
     String[] user;
 
-    //swing things vv
+    //SWING THINGS
+    //MAIN
     private JPanel mainPanel;
+
+    //LOGIN AND REGISTER PAGE
     private JPanel loginPage;
-    private JButton selectRegisterButton;
-    private JPanel holderPanel;
-    private JButton selectLoginButton;
     private JPanel inputDetails;
+
+    //ID NUMBER PANEL
     private JPanel idNumberPanel;
+    private JLabel studentIDLabel;
+    private JTextField inputUsername;
+
+    //PASSWORD PANEL
     private JPanel passwordPanel;
+    private JPasswordField inputPassword;
     private JLabel titleSelected;
     private JButton finalButton;
-    private JTextField inputUsername;
+
+    //ADDITIONAL REGISTRATION DETAILS 1
+
+    //ADDITIONAL REGISTRATION DETAILS 2
+
     private JButton redirectToOther;
     private JPanel additionalRegistrationDetails2;
     private JPanel additionalRegistrationDetails1;
     private JTextField inputIDNumber;
-    private JLabel studentIDLabel;
     private JTextField inputContactNumber;
     private JTextField inputCourseAndYear;
     private JLabel contactNumberLabel;
     private JLabel courseAndYearLabel;
     private JButton clearEntriesButton;
-    private JPasswordField inputPassword;
+
+
+    //LOST ITEMS PAGE
     private JPanel lostItemsPage;
+    private JPanel foundItemsPage;
     private JPanel reportAnItemPage;
     private JPanel profilePage;
     private JPanel messageTheOwnerPage;
@@ -57,7 +73,9 @@ public class LFForm extends JFrame {
     private JPanel itemDetailsPage;
     private JPanel itemsHolder;
 
-    public static void start(JPanel inputDetails, JPanel lostItemsPage, JPanel reportAnItemPage, JPanel profilePage, JPanel constantPanel, JPanel messageTheOwnerPage, JPanel itemDetailsPage) {
+    //TODO
+    //Rename start() into something meaningful.
+    public void start() {
         inputDetails.setVisible(false);
         lostItemsPage.setVisible(false);
         reportAnItemPage.setVisible(false);
@@ -67,8 +85,7 @@ public class LFForm extends JFrame {
         itemDetailsPage.setVisible(false);
     }
 
-    public static void goToLogin(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2) {
-        holderPanel.setVisible(false);
+    public void goToLogin() {
         inputDetails.setVisible(true);
         titleSelected.setText("Login");
         finalButton.setText("Login");
@@ -76,8 +93,7 @@ public class LFForm extends JFrame {
         additionalRegistrationDetails1.setVisible(false);
         additionalRegistrationDetails2.setVisible(false);
     }
-    public static void goToRegister(JPanel holderPanel, JPanel inputDetails, JLabel titleSelected, JButton finalButton, JButton redirectToOther, JPanel additionalRegistrationDetails1, JPanel additionalRegistrationDetails2){
-        holderPanel.setVisible(false);
+    public void goToRegister(){
         inputDetails.setVisible(true);
         titleSelected.setText("Register");
         finalButton.setText("Register");
@@ -86,7 +102,7 @@ public class LFForm extends JFrame {
         additionalRegistrationDetails2.setVisible(true);
     }
 
-    public static void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton, JPanel itemsHolder) {
+    public void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton, JPanel itemsHolder) {
         loginPage.setVisible(false);
         lostItemsPage.setVisible(true);
         findItemPage.setVisible(false);
@@ -237,30 +253,17 @@ public class LFForm extends JFrame {
 
     public LFForm() {
         //hide other panels not in use
-        start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
+        start();
 
         //add functionality to buttons
-        //Selecting Login Button Pressed
-        selectLoginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
-            }
-        });
-
-        //Selecting Register Button Pressed
-        selectRegisterButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                goToRegister(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther,  additionalRegistrationDetails1, additionalRegistrationDetails2);
-            }
-        });
 
         redirectToOther.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(titleSelected.getText().equals("Login")){
-                    goToRegister(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
+                    goToRegister();
                 } else if(titleSelected.getText().equals("Register")){
                     clearEntriesButton.doClick();
-                    goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
+                    goToLogin();
                 }
             }
         });
@@ -343,16 +346,16 @@ public class LFForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 user = null;
 
-                start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
+                //start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
+                goToLogin();
                 loginPage.setVisible(true);
-                holderPanel.setVisible(true);
             }
         });
 
         //setup Panel
         setContentPane(mainPanel);
         //Instantly sets the form as the log-in page
-        goToLogin(holderPanel, inputDetails, titleSelected, finalButton, redirectToOther, additionalRegistrationDetails1, additionalRegistrationDetails2);
+        goToLogin();
         setTitle("Lost and Found Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(520, 780);
