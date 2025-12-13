@@ -60,11 +60,6 @@ public class LFForm extends JFrame {
 
     //3 REPORT AN ITEM PAGE
     private JPanel reportAnItemPage;
-    //3.1 PANEL
-    //3.1.1 PANEL
-    //3.1.2 PANEL
-    private JButton iLostButton;
-    private JButton iFoundAnItemButton;
 
 
     //4 PROFILE PAGE
@@ -95,11 +90,18 @@ public class LFForm extends JFrame {
 
     //7 ITEM DETAILS PAGE
     private JPanel itemDetailsPage;
+    private JTextField inputLostItemName;
     //7.1 PANEL
 
-
-    //where is this located?
-    private JPanel foundItemsPage;
+    private JLabel lostItemNameLabel;
+    private JLabel lastSeenAtLabel;
+    private JLabel lastSeenOnLabel;
+    private JLabel descriptionLabel;
+    private JTextField inputLastSeenAt;
+    private JTextField inputLastSeenOn;
+    private JTextField inputDescription;
+    private JPanel mainFieldsHolder;
+    private JComboBox itemCategoryBox;
 
     //ORIGINALLY CALLED start(). All the goTo methods call this function to hide all the panels.
     //You will need to manually set the panel you are on to true though.
@@ -128,6 +130,7 @@ public class LFForm extends JFrame {
     }
     public void goToRegister(){
         hideAll();
+        loginPage.setVisible(true);
         inputDetails.setVisible(true);
         additionalRegistrationDetails1.setVisible(true);
         additionalRegistrationDetails2.setVisible(true);
@@ -151,6 +154,8 @@ public class LFForm extends JFrame {
         markUnselected(reportAnItemButtonButton);
         markUnselected(profileButton);
 
+        itemsHolder.removeAll();//Fixed Bug regarding stacking of items
+
         try (BufferedReader br = new BufferedReader(new FileReader("Items.csv"))) {
             String line;
 
@@ -173,14 +178,25 @@ public class LFForm extends JFrame {
     //create individual items
     private static JPanel createItemPanel(String[] data) {
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200, 120));//change size if boxes too small/big
-        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panel.setPreferredSize(new Dimension(200, 120));//TODO change size if boxes too small/big
+        //panel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); //TODO decide if bordered or not
+        panel.setBackground(Color.WHITE);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         // Example fields (adjust once you finalize CSV format)
-        JLabel name = new JLabel("Item: " + data[0]);
-        JLabel location = new JLabel("Location: " + (data.length > 1 ? data[1] : "N/A")); //change accordingly to final csv format
+        JLabel username = new JLabel(data[0]);
+        username.setForeground(Color.GRAY);
+        username.setFont(new Font("Arial", Font.PLAIN, 13));
 
+        JLabel name = new JLabel(data[1]);
+        name.setForeground(Color.BLACK);
+        name.setFont(new Font("Arial", Font.BOLD, 17));
+
+        JLabel location = new JLabel("Last Seen: " + data[2]); //change accordingly to final csv format
+        location.setForeground(Color.DARK_GRAY);
+        location.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        panel.add(username);
         panel.add(name);
         panel.add(location);
 
@@ -276,6 +292,11 @@ public class LFForm extends JFrame {
         a.setForeground(Color.white);
         a.setOpaque(true);
     }
+
+    private static void setUpItemCategoryBox(JComboBox comboBox) {
+        comboBox.addItem("Item Category");
+    }
+
 
     public LFForm() {
         //add functionality to buttons
@@ -384,6 +405,7 @@ public class LFForm extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         logoIcon.setIcon(new ImageIcon("assets/cit_logo.png")); //300x212 dimensions
+        constantBanner.setIcon(new ImageIcon("assets/cit_logo.png")); //TODO get banner picture and change this
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
