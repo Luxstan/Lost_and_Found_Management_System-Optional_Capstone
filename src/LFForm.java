@@ -13,69 +13,98 @@ public class LFForm extends JFrame {
     LFSystem system = new LFSystem();
 
     //track current user
-    String[] user;
+    String[] user; //Note that we should also use the USER LIST and stuff from the system object
 
     //SWING THINGS
     //MAIN
     private JPanel mainPanel;
 
-    //LOGIN AND REGISTER PAGE
+    //1 LOGIN AND REGISTER PAGE
     private JPanel loginPage;
+    private JLabel logoIcon;
+    //1.1 INPUT DETAILS PANEL
     private JPanel inputDetails;
-
-    //ID NUMBER PANEL
-    private JPanel idNumberPanel;
-    private JLabel studentIDLabel;
-    private JTextField inputUsername;
-
-    //PASSWORD PANEL
-    private JPanel passwordPanel;
-    private JPasswordField inputPassword;
     private JLabel titleSelected;
     private JButton finalButton;
-
-    //ADDITIONAL REGISTRATION DETAILS 1
-
-    //ADDITIONAL REGISTRATION DETAILS 2
-
     private JButton redirectToOther;
-    private JPanel additionalRegistrationDetails2;
-    private JPanel additionalRegistrationDetails1;
-    private JTextField inputIDNumber;
-    private JTextField inputContactNumber;
-    private JTextField inputCourseAndYear;
-    private JLabel contactNumberLabel;
-    private JLabel courseAndYearLabel;
     private JButton clearEntriesButton;
+    //1.1.1 ID NUMBER PANEL
+    private JPanel idNumberPanel;
+    private JTextField inputUsername;
+    //1.1.2 PASSWORD PANEL
+    private JPanel passwordPanel;
+    private JPasswordField inputPassword;
+    //1.1.3 ADDITIONAL REGISTRATION DETAILS 1
+    private JPanel additionalRegistrationDetails1;
+    private JLabel contactNumberLabel;
+    private JTextField inputContactNumber;
+    private JLabel courseAndYearLabel;
+    private JTextField inputCourseAndYear;
+    //1.1.4 ADDITIONAL REGISTRATION DETAILS 2
+    private JPanel additionalRegistrationDetails2;
+    private JLabel studentIDLabel;
+    private JTextField inputIDNumber;
 
 
-    //LOST ITEMS PAGE
+    //2 LOST ITEMS PAGE
     private JPanel lostItemsPage;
-    private JPanel foundItemsPage;
+    //2.1 PANEL
+    //2.1.1 SEPARATOR HOLDER PANEL
+    private JPanel separatorHolder;
+    //2.2 LOST ITEMS HOLDER
+    private JPanel lostItemsHolder;
+    //2.2.1 SCROLLED ITEMS HOLDER [SCROLL PANE]
+    private JScrollPane scrolledItemsHolder;
+    private JPanel itemsHolder;
+
+
+    //3 REPORT AN ITEM PAGE
     private JPanel reportAnItemPage;
+    //3.1 PANEL
+    //3.1.1 PANEL
+    //3.1.2 PANEL
+    private JButton iLostButton;
+    private JButton iFoundAnItemButton;
+
+
+    //4 PROFILE PAGE
     private JPanel profilePage;
+    //4.1 PANEL
+    private JLabel profileLabel;
+    //4.1.1 PANEL
+
+
+    //5 MESSAGE THE OWNER PAGE
     private JPanel messageTheOwnerPage;
-    private JLabel logoIcon;
+    //5.1 PANEL
+    //5.1.1 PANEL
+
+
+    //6 CONSTANT PANEL [SERVES AS THE NAV BAR FOR THE FORM]
     private JPanel constantPanel;
     private JLabel constantBanner;
+    //6.1 PANEL
+    private JButton logoutButton;
+    private JLabel greetingsLabel;
+    //6.1.1 MAIN TABS HOLDER
+    private JPanel mainTabsHolder;
     private JButton profileButton;
     private JButton reportAnItemButton;
     private JButton lostItemsButton;
-    private JPanel mainTabsHolder;
-    private JLabel greetingsLabel;
-    private JButton logoutButton;
-    private JPanel separatorHolder;
-    private JScrollPane scrolledItemsHolder;
-    private JPanel lostItemsHolder;
-    private JButton iLostButton;
-    private JButton iFoundAnItemButton;
-    private JLabel profileLabel;
-    private JPanel itemDetailsPage;
-    private JPanel itemsHolder;
 
-    //TODO
-    //Rename start() into something meaningful.
-    public void start() {
+
+    //7 ITEM DETAILS PAGE
+    private JPanel itemDetailsPage;
+    //7.1 PANEL
+
+
+    //where is this located?
+    private JPanel foundItemsPage;
+
+    //ORIGINALLY CALLED start(). All the goTo methods call this function to hide all the panels.
+    //You will need to manually set the panel you are on to true though.
+    public void hideAll() {
+        loginPage.setVisible(false);
         inputDetails.setVisible(false);
         lostItemsPage.setVisible(false);
         reportAnItemPage.setVisible(false);
@@ -83,31 +112,35 @@ public class LFForm extends JFrame {
         constantPanel.setVisible(false);
         messageTheOwnerPage.setVisible(false);
         itemDetailsPage.setVisible(false);
-    }
 
-    public void goToLogin() {
-        inputDetails.setVisible(true);
-        titleSelected.setText("Login");
-        finalButton.setText("Login");
-        redirectToOther.setText("Register?");
         additionalRegistrationDetails1.setVisible(false);
         additionalRegistrationDetails2.setVisible(false);
     }
-    public void goToRegister(){
+
+    public void goToLogin() {
+        hideAll();
+        loginPage.setVisible(true);
         inputDetails.setVisible(true);
+
+        titleSelected.setText("Login");
+        finalButton.setText("Login");
+        redirectToOther.setText("Register?");
+    }
+    public void goToRegister(){
+        hideAll();
+        inputDetails.setVisible(true);
+        additionalRegistrationDetails1.setVisible(true);
+        additionalRegistrationDetails2.setVisible(true);
+
         titleSelected.setText("Register");
         finalButton.setText("Register");
         redirectToOther.setText("Login?");
-        additionalRegistrationDetails1.setVisible(true);
-        additionalRegistrationDetails2.setVisible(true);
     }
 
-    public void goToLostItems(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton, JPanel itemsHolder) {
-        loginPage.setVisible(false);
+    public void goToLostItems(String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton, JPanel itemsHolder) {
+        hideAll();
         lostItemsPage.setVisible(true);
-        findItemPage.setVisible(false);
-        profilePage.setVisible(false);
-        messageTheOwnerPage.setVisible(false);
+
         if(!constantPanel.isVisible()){
             constantPanel.setVisible(true);
         }
@@ -136,6 +169,7 @@ public class LFForm extends JFrame {
         }
 
     }
+
     //create individual items
     private static JPanel createItemPanel(String[] data) {
         JPanel panel = new JPanel();
@@ -153,13 +187,10 @@ public class LFForm extends JFrame {
         return panel;
     }
 
+    public void goToReportAnItem(String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+        hideAll();
+        reportAnItemPage.setVisible(true);
 
-    public static void goToReportAnItem(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
-        loginPage.setVisible(false);
-        lostItemsPage.setVisible(false);
-        findItemPage.setVisible(true);
-        profilePage.setVisible(false);
-        messageTheOwnerPage.setVisible(false);
         if(!constantPanel.isVisible()){
             constantPanel.setVisible(true);
         }
@@ -171,12 +202,10 @@ public class LFForm extends JFrame {
         markUnselected(profileButton);
     }
 
-    public static void goToProfile(JPanel loginPage, JPanel lostItemsPage, JPanel findItemPage, JPanel profilePage, JPanel messageTheOwnerPage, JPanel constantPanel, JLabel greetingsLabel, String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
-        loginPage.setVisible(false);
-        lostItemsPage.setVisible(false);
-        findItemPage.setVisible(false);
+    public void goToProfile(String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+        hideAll();
         profilePage.setVisible(true);
-        messageTheOwnerPage.setVisible(false);
+
         if(!constantPanel.isVisible()){
             constantPanel.setVisible(true);
         }
@@ -187,8 +216,6 @@ public class LFForm extends JFrame {
         markUnselected(reportAnItemButtonButton);
         markSelected(profileButton);
     }
-
-
 
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
     //CSV format: username,password,IDNumber,contactNumber,courseAndYear
@@ -250,13 +277,8 @@ public class LFForm extends JFrame {
         a.setOpaque(true);
     }
 
-
     public LFForm() {
-        //hide other panels not in use
-        start();
-
         //add functionality to buttons
-
         redirectToOther.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if(titleSelected.getText().equals("Login")){
@@ -292,7 +314,7 @@ public class LFForm extends JFrame {
                         case "Login":
                             if (onRecord!=null) {
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
-                                    goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
+                                    goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
                                     clearEntriesButton.doClick();
                                 } else {
                                     throw new IncorrectPassword();
@@ -326,19 +348,19 @@ public class LFForm extends JFrame {
 
         lostItemsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToLostItems(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
+                goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
             }
         });
 
         reportAnItemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToReportAnItem(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+                goToReportAnItem(user, lostItemsButton, reportAnItemButton, profileButton);
             }
         });
 
         profileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToProfile(loginPage, lostItemsPage, reportAnItemPage, profilePage, messageTheOwnerPage, constantPanel, greetingsLabel, user, lostItemsButton, reportAnItemButton, profileButton);
+                goToProfile(user, lostItemsButton, reportAnItemButton, profileButton);
             }
         });
 
@@ -371,7 +393,6 @@ public class LFForm extends JFrame {
         itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
 
         //Set up properties of certain fields beforehand
-        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [i'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
+        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
     }
-
 }
