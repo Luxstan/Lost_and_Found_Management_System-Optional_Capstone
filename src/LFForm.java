@@ -116,6 +116,7 @@ public class LFForm extends JFrame {
     private JLabel imagePreviewLabel;
     private JScrollPane detailsHolder;
     private JButton backButton;
+    private JButton foundOrLostButton;
     private String uploadedImageFileName = ""; // stores just the filename
 
     private JButton submitReportButton;
@@ -242,8 +243,45 @@ public class LFForm extends JFrame {
         markUnselected(reportAnItemButton);
         markUnselected(profileButton);
 
+        configureFoundOrLostButton(data);
+
         // Populate the details
         populateItemDetails(data, detailsHolder);
+    }
+
+    private void configureFoundOrLostButton(String[] data) {
+        // Remove all existing action listeners to prevent duplicates
+        for (ActionListener al : foundOrLostButton.getActionListeners()) {
+            foundOrLostButton.removeActionListener(al);
+        }
+
+        // Set button text and style based on status
+        if (data[6].equals("Lost")) {
+            foundOrLostButton.setText("I found this");
+            foundOrLostButton.setBackground(Color.decode("#006400")); // Dark green
+            foundOrLostButton.setForeground(Color.WHITE);
+        } else { // Found
+            foundOrLostButton.setText("This is mine");
+            foundOrLostButton.setBackground(Color.decode("#FFD700")); // Gold
+            foundOrLostButton.setForeground(Color.decode("#800000")); // Maroon
+        }
+
+        foundOrLostButton.setOpaque(true);
+        foundOrLostButton.setBorderPainted(false);
+        foundOrLostButton.setFocusPainted(false);
+
+        // Add new action listener with current data
+        foundOrLostButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        data[1] + " is now notified\nWait for a reply",
+                        "Notification Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
     }
 
     private void populateItemDetails(String[] data, JScrollPane detailsHolder) {
@@ -1435,7 +1473,11 @@ public class LFForm extends JFrame {
         itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
         setUpItemCategoryBox(itemCategoryBox);
         setupImageDragAndDrop();
-        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
+        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15);//n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
         scrollableDetails.getVerticalScrollBar().setUnitIncrement(15);
+        backButton.setOpaque(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setBorderPainted(false);
+        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15);
     }
 }
