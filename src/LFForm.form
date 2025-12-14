@@ -427,8 +427,8 @@
                         <margin top="0" left="0" bottom="0" right="0"/>
                         <constraints>
                           <grid row="9" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                            <minimum-size width="-1" height="100"/>
-                            <preferred-size width="-1" height="100"/>
+                            <minimum-size width="-1" height="25"/>
+                            <preferred-size width="-1" height="25"/>
                           </grid>
                         </constraints>
                         <properties/>
