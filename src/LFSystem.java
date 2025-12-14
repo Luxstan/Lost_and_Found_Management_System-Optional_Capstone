@@ -403,4 +403,70 @@ public class LFSystem {
             }
         } catch (IOException ignored) {}
     }
+
+    public String displayUserLostList(){
+        //current_user.displayList("LOST");
+        return current_user.outputItemName("LOST");
+    }
+
+    public String displayUserFoundList(){
+        //current_user.displayList("FOUND");
+        return current_user.outputItemName("FOUND");
+    }
+
+    public void createItem(String status, String item_name, String details, String lastSeenAt, String reportedBy, int category){
+        System.out.println(category);
+        /*
+        There are 0-9 Categories in the combo box
+        Accessory
+        Bag
+        Clothing
+        Document
+        Electronic
+        Food Container
+        Money
+        Tumbler
+        Others
+        */
+        Item a = null;
+        switch(category){
+            case 1:
+                a = new Accessory();
+            case 2:
+                a = new Bag();
+            case 3:
+                a = new Clothing();
+            case 4:
+                a = new Document();
+            case 5:
+                a = new Electronic();
+            case 6:
+                a = new FoodContainer();
+            case 7:
+                a = new Money();
+            case 8:
+                a = new FoodContainer();
+            case 9:
+                a = new Miscellaneous();
+            default:
+                break;
+        }
+        if(a == null){
+            System.out.println("ERROR. ITEM IS NULL.");
+            return;
+        }
+        a.setItemID(item_id);
+        a.setItemName(item_name);
+        a.setDetails(details);
+        a.setLastLocationSeen(lastSeenAt);
+        if(status.equals("Lost")){
+            current_user.addLostItem(a);
+        }
+        else if(status.equals("Found")){
+            a.setFoundBy(reportedBy);
+            current_user.addFoundItem(a);
+        }
+
+
+    }
 }

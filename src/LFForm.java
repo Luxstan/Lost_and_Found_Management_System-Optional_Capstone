@@ -126,6 +126,9 @@ public class LFForm extends JFrame {
     private JScrollPane detailsHolder;
     private JButton backButton;
     private JButton foundOrLostButton;
+    private JScrollPane scrollableProfilePage;
+    private JLabel userLostItem;
+    private JLabel userFounditem;
     private String uploadedImageFileName = ""; // stores just the filename
 
     private JButton submitReportButton;
@@ -629,6 +632,14 @@ public class LFForm extends JFrame {
         markUnselected(lostItemsButton);
         markUnselected(reportAnItemButton);
         markSelected(profileButton);
+
+        editInformationButton.setBackground(Color.decode("#FFD700")); // Gold
+        editInformationButton.setForeground(Color.decode("#800000")); // Maroon
+
+        //Displays the user's lost and found list
+        userLostItem.setText(system.displayUserLostList());
+        System.out.println(system.displayUserLostList());
+        userFounditem.setText(system.displayUserFoundList());
     }
 
     public void setProfilePage(){
@@ -1040,6 +1051,9 @@ public class LFForm extends JFrame {
     private void recordReport(String reportedBy, String status, String itemName, String lastSeenAt, String lastSeenOn, String description, int categoryIndex) {
         int reportNumber = getNextReportNumber();
         String category = (String) itemCategoryBox.getItemAt(categoryIndex);
+        system.createItem(status, itemName, description, lastSeenAt, reportedBy, categoryIndex);
+
+
 
 // Rename and move image file if exists
         String imageFileName = "N/A";

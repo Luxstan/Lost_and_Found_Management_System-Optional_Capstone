@@ -12,6 +12,7 @@ public class FoodContainer extends ColoredItem{
         this.brand = brand;
         this.type = type;
     }
+    public FoodContainer(){}
     //Setters and Getters
     public String getType(){return type;}
     public String getBrand(){return brand;}

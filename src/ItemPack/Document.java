@@ -10,7 +10,7 @@ public class Document extends Item{
         this.ownerID = ownerID;
         this.type = docType;
     }
-
+    public Document(){}
     //Setters and Getters
     public void setOwnerName(String ownerName){
         this.ownerName = ownerName;

@@ -11,6 +11,7 @@ public class Bag extends ColoredItem implements Wearable{
         this.material = material;
         this.type = type;
     }
+    public Bag(){}
     //Setters and Getters
     public String getBrand(){return brand;}
     public String getType(){return type;}
