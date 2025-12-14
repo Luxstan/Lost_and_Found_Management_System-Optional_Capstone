@@ -89,7 +89,6 @@ public class LFForm extends JFrame {
 
 
     //7 ITEM DETAILS PAGE
-    private JPanel itemDetailsPage;
     private JTextField inputLostItemName;
     //7.1 PANEL
 
@@ -103,6 +102,16 @@ public class LFForm extends JFrame {
     private JPanel mainFieldsHolder;
     private JComboBox itemCategoryBox;
 
+    //Additonal details panels
+    private JPanel accessoryAdditionalDetails;
+    private JPanel bagAdditionalDetails;
+    private JPanel clothingAdditionalDetails;
+    private JPanel documentAdditionalDetails;
+    private JPanel electronicAdditionalDetails;
+    private JPanel foodContainerAdditionalDetails;
+    private JPanel moneyAdditionalDetails;
+    private JPanel wearableElectronicAdditionalDetails;
+
     //ORIGINALLY CALLED start(). All the goTo methods call this function to hide all the panels.
     //You will need to manually set the panel you are on to true though.
     public void hideAll() {
@@ -113,7 +122,6 @@ public class LFForm extends JFrame {
         profilePage.setVisible(false);
         constantPanel.setVisible(false);
         messageTheOwnerPage.setVisible(false);
-        itemDetailsPage.setVisible(false);
 
         additionalRegistrationDetails1.setVisible(false);
         additionalRegistrationDetails2.setVisible(false);
