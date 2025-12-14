@@ -12,8 +12,15 @@ public class LFForm extends JFrame {
     //LFSystem
     LFSystem system = new LFSystem();
 
+    //Changes
     //track current user
     String[] user; //Note that we should also use the USER LIST and stuff from the system object
+
+    // ====== NEW MODIFICATION 1: Added User object reference ======
+    // This stores the current logged-in user as a User object, not just String array
+    // This is needed because LFReport requires a User object to add items to their lists
+    User currentUserObject;
+    // ============================================================
 
     //SWING THINGS
     //MAIN
@@ -60,6 +67,11 @@ public class LFForm extends JFrame {
 
     //3 REPORT AN ITEM PAGE
     private JPanel reportAnItemPage;
+    //3.1 PANEL
+    //3.1.1 PANEL
+    //3.1.2 PANEL
+    private JButton iLostButton;
+    private JButton iFoundAnItemButton;
 
 
     //4 PROFILE PAGE
@@ -90,18 +102,28 @@ public class LFForm extends JFrame {
 
     //7 ITEM DETAILS PAGE
     private JPanel itemDetailsPage;
-    private JTextField inputLostItemName;
     //7.1 PANEL
 
+
+    //Changes
+    //Left over fields (I wrote this in because they are in the form, and it does not run without these)
+    //Because the reportAnItemButton now redirects to the reportPage form
+
+    private JLabel lostItemName;
     private JLabel lostItemNameLabel;
+    private JTextField inputLastSeenAt;
     private JLabel lastSeenAtLabel;
     private JLabel lastSeenOnLabel;
     private JLabel descriptionLabel;
-    private JTextField inputLastSeenAt;
     private JTextField inputLastSeenOn;
-    private JTextField inputDescription;
     private JPanel mainFieldsHolder;
+    private JTextField inputLostItemName;
+    private JTextField inputDescription;
     private JComboBox itemCategoryBox;
+
+
+    //where is this located?
+    private JPanel foundItemsPage;
 
     //ORIGINALLY CALLED start(). All the goTo methods call this function to hide all the panels.
     //You will need to manually set the panel you are on to true though.
@@ -128,9 +150,9 @@ public class LFForm extends JFrame {
         finalButton.setText("Login");
         redirectToOther.setText("Register?");
     }
+
     public void goToRegister(){
         hideAll();
-        loginPage.setVisible(true);
         inputDetails.setVisible(true);
         additionalRegistrationDetails1.setVisible(true);
         additionalRegistrationDetails2.setVisible(true);
@@ -154,7 +176,12 @@ public class LFForm extends JFrame {
         markUnselected(reportAnItemButtonButton);
         markUnselected(profileButton);
 
-        itemsHolder.removeAll();//Fixed Bug regarding stacking of items
+        //Changes
+        // ====== NEW MODIFICATION 2: Clear existing items before loading ======
+        // This prevents duplicate items from showing up when refreshing the page
+        // Important for when items are added via LFReport and we need to reload
+        itemsHolder.removeAll();
+        // =====================================================================
 
         try (BufferedReader br = new BufferedReader(new FileReader("Items.csv"))) {
             String line;
@@ -172,36 +199,32 @@ public class LFForm extends JFrame {
         } catch (IOException e) {
             //do nothing
         }
-
+        //Changes
+        // ====== NEW MODIFICATION 3: Refresh the display ======
+        // These calls ensure the UI updates immediately after adding new items
+        itemsHolder.revalidate();
+        itemsHolder.repaint();
+        // =====================================================
     }
 
     //create individual items
     private static JPanel createItemPanel(String[] data) {
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200, 120));//TODO change size if boxes too small/big
-        //panel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); //TODO decide if bordered or not
-        panel.setBackground(Color.WHITE);
+        panel.setPreferredSize(new Dimension(200, 120));//change size if boxes too small/big
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         // Example fields (adjust once you finalize CSV format)
-        JLabel username = new JLabel(data[0]);
-        username.setForeground(Color.GRAY);
-        username.setFont(new Font("Arial", Font.PLAIN, 13));
+        JLabel name = new JLabel("Item: " + data[0]);
+        JLabel location = new JLabel("Location: " + (data.length > 1 ? data[1] : "N/A")); //change accordingly to final csv format
 
-        JLabel name = new JLabel(data[1]);
-        name.setForeground(Color.BLACK);
-        name.setFont(new Font("Arial", Font.BOLD, 17));
-
-        JLabel location = new JLabel("Last Seen: " + data[2]); //change accordingly to final csv format
-        location.setForeground(Color.DARK_GRAY);
-        location.setFont(new Font("Arial", Font.PLAIN, 12));
-
-        panel.add(username);
         panel.add(name);
         panel.add(location);
 
         return panel;
     }
+
+    //This is unused as reportAnItemPage now directs to LFReport now instead of ReportAnItem page
 
     public void goToReportAnItem(String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
         hideAll();
@@ -280,6 +303,28 @@ public class LFForm extends JFrame {
         } catch (IOException ignored) {}
     }
 
+    //Changes
+    // ====== NEW MODIFICATION 4: Create User object from CSV data ======
+    // This method converts the String[] from CSV into a proper User object
+    // Required because LFReport needs a User object to work with
+    // CSV format: username,password,IDNumber,contactNumber,courseAndYear (e.g., "CS-3")
+    private User createUserObject(String[] userData) {
+        String username = userData[0];
+        String idNumber = userData[2];
+        String password = userData[1];
+        String contactNo = userData[3];
+        String courseAndYear = userData[4];
+
+        // Parse the courseAndYear field (format: "CS-3" or "BSIT-4")
+        String[] courseYear = courseAndYear.split("-");
+        String course = courseYear[0];
+        int year = Integer.parseInt(courseYear[1]);
+
+        // Return a new User object with all the parsed data
+        return new User(username, idNumber, password, contactNo, course, year);
+    }
+    // ==================================================================
+
     //tabs color changer
     public static void markSelected(JButton a){
         a.setBackground(Color.decode("#FFD700"));
@@ -292,11 +337,6 @@ public class LFForm extends JFrame {
         a.setForeground(Color.white);
         a.setOpaque(true);
     }
-
-    private static void setUpItemCategoryBox(JComboBox comboBox) {
-        comboBox.addItem("Item Category");
-    }
-
 
     public LFForm() {
         //add functionality to buttons
@@ -335,6 +375,12 @@ public class LFForm extends JFrame {
                         case "Login":
                             if (onRecord!=null) {
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
+                                    // ====== NEW MODIFICATION 5: Create User object on login ======
+                                    // When user logs in successfully, create a User object
+                                    // This object is needed for LFReport to add items to user's lists
+                                    currentUserObject = createUserObject(onRecord);
+                                    // =============================================================
+
                                     goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
                                     clearEntriesButton.doClick();
                                 } else {
@@ -373,11 +419,47 @@ public class LFForm extends JFrame {
             }
         });
 
+        //Changes
+        // ====== NEW MODIFICATION 6: Updated report button to open LFReport window ======
+        // Instead of just changing the view, this now opens the LFReport form in a new window
+        // Passes currentUserObject (User), system (LFSystem), and reference to this form
+        // The reference to this form allows LFReport to refresh the items list after adding items
         reportAnItemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToReportAnItem(user, lostItemsButton, reportAnItemButton, profileButton);
+                if (currentUserObject != null) {
+                    // Open the LFReport window with current user and system
+                    new LFReport(currentUserObject, system, LFForm.this);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error: User not logged in");
+                }
             }
         });
+        // ===============================================================================
+        //Changes
+        // ====== NEW MODIFICATION 7: Added listeners for report page buttons ======
+        // If you have "I Lost" and "I Found" buttons on the reportAnItemPage,
+        // these will also open the LFReport window
+        // This provides multiple ways to access the report functionality
+        if (iLostButton != null) {
+            iLostButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (currentUserObject != null) {
+                        new LFReport(currentUserObject, system, LFForm.this);
+                    }
+                }
+            });
+        }
+
+        if (iFoundAnItemButton != null) {
+            iFoundAnItemButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (currentUserObject != null) {
+                        new LFReport(currentUserObject, system, LFForm.this);
+                    }
+                }
+            });
+        }
+        // =========================================================================
 
         profileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -389,7 +471,13 @@ public class LFForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 user = null;
 
-                //start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
+                //Changes
+                // ====== NEW MODIFICATION 8: Clear User object on logout ======
+                // Important: set currentUserObject to null when logging out
+                // This prevents unauthorized access to previous user's data
+                currentUserObject = null;
+                // =============================================================
+
                 goToLogin();
                 loginPage.setVisible(true);
             }
@@ -405,7 +493,6 @@ public class LFForm extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         logoIcon.setIcon(new ImageIcon("assets/cit_logo.png")); //300x212 dimensions
-        constantBanner.setIcon(new ImageIcon("assets/cit_logo.png")); //TODO get banner picture and change this
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
@@ -417,4 +504,13 @@ public class LFForm extends JFrame {
         //Set up properties of certain fields beforehand
         scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
     }
+    //Changes
+    // ====== NEW MODIFICATION 9: Method to refresh items list ======
+    // This method is called from LFReport after successfully adding an item
+    // It reloads the lost items page to show the newly added item
+    // This creates a seamless experience where changes are immediately visible
+    public void refreshItemsList() {
+        goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
+    }
+    // ==============================================================
 }
