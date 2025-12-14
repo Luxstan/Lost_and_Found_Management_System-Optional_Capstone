@@ -29,9 +29,9 @@ public class LFSystem {
     }
 
     //Methods
-    public void addLostItem(Item a){}
+    /*public void addLostItem(Item a){}
     public void addFoundItem(Item a){}
-    public void searchItem(Item a){}
+    public void searchItem(Item a){}*/
 
     public void createUser(String name, String id, String pass, String contactNo, String course, int year){
         //First looks if it is not a duplicate. Returns and does nothing if it is a dupe.

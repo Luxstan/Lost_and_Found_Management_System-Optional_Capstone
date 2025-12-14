@@ -18,7 +18,6 @@ public class LFForm extends JFrame {
 
     //LFSystem
     LFSystem system = new LFSystem();
-    User current_user;
 
     //track current user
     String[] user; //Note that we should also use the USER LIST and stuff from the system object
