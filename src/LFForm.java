@@ -6,6 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Objects;
+//for images
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 public class LFForm extends JFrame {
 
@@ -103,6 +110,9 @@ public class LFForm extends JFrame {
     private JRadioButton notInWalletRadio;
     private JButton foundButton;
     private JButton lostButton;
+    private JPanel imageDropZone;
+    private JLabel imagePreviewLabel;
+    private String uploadedImageFileName = ""; // stores just the filename
 
     private JButton submitReportButton;
 
@@ -141,6 +151,7 @@ public class LFForm extends JFrame {
 
     private JTextField othersItemType;
     private JTextField othersColor;
+    private String uploadedImageFilePath = ""; // Add this near line 150
 
 
     //ORIGINALLY CALLED start(). All the goTo methods call this function to hide all the panels.
@@ -217,27 +228,84 @@ public class LFForm extends JFrame {
     //create individual items
     private static JPanel createItemPanel(String[] data) {
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(200, 120));//TODO change size if boxes too small/big
-        //panel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); //TODO decide if bordered or not
+        panel.setPreferredSize(new Dimension(200, 200)); // Increased height for image
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         panel.setBackground(Color.WHITE);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Example fields (adjust once you finalize CSV format)
+        // 1. Reported By (username) - LEFT with margin
         JLabel username = new JLabel(data[1]);
         username.setForeground(Color.GRAY);
         username.setFont(new Font("Arial", Font.PLAIN, 13));
+        username.setAlignmentX(Component.LEFT_ALIGNMENT);
+        username.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); // 2px margin
 
+        // 2. Item Name - LEFT with margin
         JLabel name = new JLabel(data[2]);
         name.setForeground(Color.BLACK);
         name.setFont(new Font("Arial", Font.BOLD, 17));
+        name.setAlignmentX(Component.LEFT_ALIGNMENT);
+        name.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); // 2px margin
 
-        JLabel location = new JLabel("Last Seen: " + data[3]); //change accordingly to final csv format
+        // 3. Last Seen Location - LEFT with margin
+        JLabel location = new JLabel("Last Seen: " + data[3]);
         location.setForeground(Color.DARK_GRAY);
         location.setFont(new Font("Arial", Font.PLAIN, 12));
+        location.setAlignmentX(Component.LEFT_ALIGNMENT);
+        location.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); // 2px margin
 
+        // Add text elements first
         panel.add(username);
         panel.add(name);
         panel.add(location);
+        panel.add(Box.createRigidArea(new Dimension(0, 5))); // Small spacing
+
+        // 4. Image (if exists) - CENTERED, fills remaining space (no margin)
+        if (data.length > 8 && !data[8].equals("N/A")) {
+            try {
+                File imageFile = new File("assets/reportedItems/" + data[8]);
+                if (imageFile.exists()) {
+                    ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
+
+                    // Calculate available space (panel height - text height - spacing)
+                    int availableHeight = 200 - 60; // Approximate height for 3 text lines
+                    int availableWidth = 190; // Slightly less than panel width for padding
+
+                    int originalWidth = imageIcon.getIconWidth();
+                    int originalHeight = imageIcon.getIconHeight();
+
+                    // Scale to fit available space while preserving aspect ratio
+                    double widthRatio = (double) availableWidth / originalWidth;
+                    double heightRatio = (double) availableHeight / originalHeight;
+                    double scale = Math.min(widthRatio, heightRatio);
+
+                    int newWidth = (int) (originalWidth * scale);
+                    int newHeight = (int) (originalHeight * scale);
+
+                    Image scaledImage = imageIcon.getImage().getScaledInstance(
+                            newWidth, newHeight, Image.SCALE_SMOOTH);
+
+                    // Create a wrapper panel to center the image
+                    JPanel imagePanel = new JPanel();
+                    imagePanel.setLayout(new BorderLayout());
+                    imagePanel.setBackground(Color.WHITE);
+                    imagePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    imagePanel.setMaximumSize(new Dimension(200, availableHeight));
+
+                    JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
+                    imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                    imageLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+                    imagePanel.add(imageLabel, BorderLayout.CENTER);
+                    panel.add(imagePanel);
+                }
+            } catch (Exception e) {
+                // No image, continue without it
+            }
+        } else {
+            // Add glue to push content up if no image
+            panel.add(Box.createVerticalGlue());
+        }
 
         return panel;
     }
@@ -667,26 +735,65 @@ public class LFForm extends JFrame {
         int reportNumber = getNextReportNumber();
         String category = (String) itemCategoryBox.getItemAt(categoryIndex);
 
-        String reportData = reportNumber + "," + reportedBy + "," + itemName + "," + lastSeenAt + "," + lastSeenOn + "," + description + "," + status + "," + category;
+// Rename and move image file if exists
+        String imageFileName = "N/A";
+        if (!uploadedImageFilePath.isEmpty()) {
+            try {
+                File destDir = new File("assets/reportedItems");
+                if (!destDir.exists()) {
+                    destDir.mkdirs();
+                }
 
+                // Create filename with report number
+                imageFileName = reportNumber + uploadedImageFileName; // extension stored in uploadedImageFileName
+                File destFile = new File(destDir, imageFileName);
+
+                // Copy file with new name
+                Files.copy(new File(uploadedImageFilePath).toPath(), destFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception ex) {
+                imageFileName = "N/A";
+            }
+        }
+
+        String reportData = reportNumber + "," + reportedBy + "," + itemName + "," +
+                lastSeenAt + "," + lastSeenOn + "," + description + "," +
+                status + "," + category + "," + imageFileName;
+
+        // Rest of the switch statement stays the same...
         switch (categoryIndex) {
             case 1: // Accessory
-                reportData = reportData + "," + (accessoryColor.getText().isEmpty() ? "N/A" : accessoryColor.getText()) + "," + (accessoryMaterial.getText().isEmpty() ? "N/A" : accessoryMaterial.getText()) + "," + (accessoryType.getText().isEmpty() ? "N/A" : accessoryType.getText());
+                reportData = reportData + "," + (accessoryColor.getText().isEmpty() ? "N/A" : accessoryColor.getText()) +
+                        "," + (accessoryMaterial.getText().isEmpty() ? "N/A" : accessoryMaterial.getText()) +
+                        "," + (accessoryType.getText().isEmpty() ? "N/A" : accessoryType.getText());
                 break;
             case 2: // Bag
-                reportData = reportData + "," + (bagColor.getText().isEmpty() ? "N/A" : bagColor.getText()) + "," + (bagBrand.getText().isEmpty() ? "N/A" : bagBrand.getText()) + "," + (bagType.getText().isEmpty() ? "N/A" : bagType.getText());
+                reportData = reportData + "," + (bagColor.getText().isEmpty() ? "N/A" : bagColor.getText()) +
+                        "," + (bagBrand.getText().isEmpty() ? "N/A" : bagBrand.getText()) +
+                        "," + (bagType.getText().isEmpty() ? "N/A" : bagType.getText());
                 break;
             case 3: // Clothing
-                reportData = reportData + "," + (clothingColor.getText().isEmpty() ? "N/A" : clothingColor.getText()) + "," + (clothingSize.getText().isEmpty() ? "N/A" : clothingSize.getText()) + "," + (clothingBrand.getText().isEmpty() ? "N/A" : clothingBrand.getText()) + "," + (clothingMaterial.getText().isEmpty() ? "N/A" : clothingMaterial.getText()) + "," + (clothingType.getText().isEmpty() ? "N/A" : clothingType.getText());
+                reportData = reportData + "," + (clothingColor.getText().isEmpty() ? "N/A" : clothingColor.getText()) +
+                        "," + (clothingSize.getText().isEmpty() ? "N/A" : clothingSize.getText()) +
+                        "," + (clothingBrand.getText().isEmpty() ? "N/A" : clothingBrand.getText()) +
+                        "," + (clothingMaterial.getText().isEmpty() ? "N/A" : clothingMaterial.getText()) +
+                        "," + (clothingType.getText().isEmpty() ? "N/A" : clothingType.getText());
                 break;
             case 4: // Document
-                reportData = reportData + "," + (documentOwnerName.getText().isEmpty() ? "N/A" : documentOwnerName.getText()) + "," + (documentOwnerID.getText().isEmpty() ? "N/A" : documentOwnerID.getText()) + "," + (documentType.getText().isEmpty() ? "N/A" : documentType.getText());
+                reportData = reportData + "," + (documentOwnerName.getText().isEmpty() ? "N/A" : documentOwnerName.getText()) +
+                        "," + (documentOwnerID.getText().isEmpty() ? "N/A" : documentOwnerID.getText()) +
+                        "," + (documentType.getText().isEmpty() ? "N/A" : documentType.getText());
                 break;
             case 5: // Electronic
-                reportData = reportData + "," + (electronicModel.getText().isEmpty() ? "N/A" : electronicModel.getText()) + "," + (electronicBrand.getText().isEmpty() ? "N/A" : electronicBrand.getText()) + "," + (electronicType.getText().isEmpty() ? "N/A" : electronicType.getText());
+                reportData = reportData + "," + (electronicModel.getText().isEmpty() ? "N/A" : electronicModel.getText()) +
+                        "," + (electronicBrand.getText().isEmpty() ? "N/A" : electronicBrand.getText()) +
+                        "," + (electronicType.getText().isEmpty() ? "N/A" : electronicType.getText());
                 break;
             case 6: // Food Container
-                reportData = reportData + "," + (foodContainerColor.getText().isEmpty() ? "N/A" : foodContainerColor.getText()) + "," + (foodContainerCapacity.getText().isEmpty() ? "N/A" : foodContainerCapacity.getText()) + "," + (foodContainerBrand.getText().isEmpty() ? "N/A" : foodContainerBrand.getText()) + "," + (foodContainerType.getText().isEmpty() ? "N/A" : foodContainerType.getText());
+                reportData = reportData + "," + (foodContainerColor.getText().isEmpty() ? "N/A" : foodContainerColor.getText()) +
+                        "," + (foodContainerCapacity.getText().isEmpty() ? "N/A" : foodContainerCapacity.getText()) +
+                        "," + (foodContainerBrand.getText().isEmpty() ? "N/A" : foodContainerBrand.getText()) +
+                        "," + (foodContainerType.getText().isEmpty() ? "N/A" : foodContainerType.getText());
                 break;
             case 7: // Money
                 String inWallet = "N/A";
@@ -707,7 +814,7 @@ public class LFForm extends JFrame {
                 break;
         }
 
-        //write to csv
+        // Write to CSV
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("Items.csv", true))) {
             bw.write(reportData);
             bw.newLine();
@@ -723,17 +830,115 @@ public class LFForm extends JFrame {
         inputDescription.setText("");
         itemCategoryBox.setSelectedIndex(0);
 
-        //clear fields
         lostButton.setSelected(false);
         foundButton.setSelected(false);
 
-        //clear panels and resize
+        // Clear image
+        uploadedImageFileName = "";
+        uploadedImageFilePath = "";
+        imagePreviewLabel.setIcon(null);
+        imagePreviewLabel.setText("Drag & Drop Image Here");
+
         additionalDetailsPanel.removeAll();
         additionalDetailsPanel.revalidate();
         additionalDetailsPanel.repaint();
     }
 
+    private void setupImageDragAndDrop() {
+        // Create the drop target
+        new DropTarget(imageDropZone, new DropTargetListener() {
+            @Override
+            public void dragEnter(DropTargetDragEvent dtde) {
+                // Visual feedback when dragging over
+                imageDropZone.setBackground(Color.decode("#FFE5B4"));
+            }
 
+            @Override
+            public void dragOver(DropTargetDragEvent dtde) {
+                // Accept the drag
+                dtde.acceptDrag(DnDConstants.ACTION_COPY);
+            }
+
+            @Override
+            public void dropActionChanged(DropTargetDragEvent dtde) {
+            }
+
+            @Override
+            public void dragExit(DropTargetEvent dte) {
+                // Reset background when drag leaves
+                imageDropZone.setBackground(Color.WHITE);
+            }
+
+            @Override
+            public void drop(DropTargetDropEvent dtde) {
+                try {
+                    // Accept the drop
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
+
+                    // Get the transferred data
+                    List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+
+                    if (!droppedFiles.isEmpty()) {
+                        File imageFile = droppedFiles.get(0);
+
+                        // Validate it's an image
+                        String fileName = imageFile.getName().toLowerCase();
+                        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") ||
+                                fileName.endsWith(".png") || fileName.endsWith(".gif")) {
+
+                            // In setupImageDragAndDrop(), after validation:
+                            uploadedImageFilePath = imageFile.getAbsolutePath();
+                            String extension = fileName.substring(fileName.lastIndexOf("."));
+                            uploadedImageFileName = extension;
+
+                            File destFile = imageFile; // Use original file for preview
+
+                            // Show preview
+                            ImageIcon imageIcon = new ImageIcon(destFile.getAbsolutePath());
+                            int maxWidth = imageDropZone.getWidth() - 20;
+                            int maxHeight = imageDropZone.getHeight() - 20;
+                            int originalWidth = imageIcon.getIconWidth();
+                            int originalHeight = imageIcon.getIconHeight();
+
+                            // Calculate scaling factor while preserving aspect ratio
+                            double widthRatio = (double) maxWidth / originalWidth;
+                            double heightRatio = (double) maxHeight / originalHeight;
+                            double scale = Math.min(widthRatio, heightRatio);
+
+                            int newWidth = (int) (originalWidth * scale);
+                            int newHeight = (int) (originalHeight * scale);
+
+                            Image scaledImage = imageIcon.getImage().getScaledInstance(
+                                    newWidth,
+                                    newHeight,
+                                    Image.SCALE_SMOOTH
+                            );
+
+                            imagePreviewLabel.setIcon(new ImageIcon(scaledImage));
+                            imagePreviewLabel.setText("");
+
+                            // Reset background
+                            imageDropZone.setBackground(Color.WHITE);
+
+                            JOptionPane.showMessageDialog(null,
+                                    "Image uploaded successfully!");
+
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                    "Please upload only image files (JPG, PNG, GIF)");
+                        }
+                    }
+
+                    dtde.dropComplete(true);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null,
+                            "Error uploading image: " + ex.getMessage());
+                    dtde.dropComplete(false);
+                }
+            }
+        });
+    }
 
 
     public LFForm() {
@@ -950,6 +1155,9 @@ public class LFForm extends JFrame {
         });
 
         //setup Panel
+        imagePreviewLabel.setText("Drag & Drop Image Here");
+        imagePreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imagePreviewLabel.setVerticalAlignment(SwingConstants.CENTER);
         setContentPane(mainPanel);
         //Instantly sets the form as the log-in page
         goToLogin();
@@ -968,6 +1176,7 @@ public class LFForm extends JFrame {
         logoutButton.setBorderPainted(false);
         itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
         setUpItemCategoryBox(itemCategoryBox);
+        setupImageDragAndDrop();
         scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
         scrollableDetails.getVerticalScrollBar().setUnitIncrement(15);
     }
