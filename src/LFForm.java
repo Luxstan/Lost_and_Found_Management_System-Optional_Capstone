@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.Objects;
 //for images
@@ -81,7 +83,7 @@ public class LFForm extends JFrame {
     private JLabel userCourseYear;
 
     //5 MESSAGE THE OWNER PAGE
-    private JPanel messageTheOwnerPage;
+    private JPanel itemDetailsPanel;
     //5.1 PANEL
     //5.1.1 PANEL
 
@@ -121,6 +123,9 @@ public class LFForm extends JFrame {
     private JPanel EditInformationButtonContainer;
     private JPanel UserHistoryContainer;
 
+    private JScrollPane detailsHolder;
+    private JButton backButton;
+    private JButton foundOrLostButton;
     private String uploadedImageFileName = ""; // stores just the filename
 
     private JButton submitReportButton;
@@ -172,7 +177,7 @@ public class LFForm extends JFrame {
         reportAnItemPage.setVisible(false);
         profilePage.setVisible(false);
         constantPanel.setVisible(false);
-        messageTheOwnerPage.setVisible(false);
+        itemDetailsPanel.setVisible(false);
 
         additionalRegistrationDetails1.setVisible(false);
         additionalRegistrationDetails2.setVisible(false);
@@ -231,9 +236,294 @@ public class LFForm extends JFrame {
 
     }
 
+    public void goToItemDetails(String[] data, JButton lostItemsButton, JButton reportAnItemButton, JButton profileButton, JScrollPane detailsHolder) {
+        hideAll();
+        itemDetailsPanel.setVisible(true);
+
+        if(!constantPanel.isVisible()){
+            constantPanel.setVisible(true);
+        }
+
+        //keep the same tab selected
+        markSelected(lostItemsButton);
+        markUnselected(reportAnItemButton);
+        markUnselected(profileButton);
+
+        configureFoundOrLostButton(data);
+
+        // Populate the details
+        populateItemDetails(data, detailsHolder);
+    }
+
+    private void configureFoundOrLostButton(String[] data) {
+        // Remove all existing action listeners to prevent duplicates
+        for (ActionListener al : foundOrLostButton.getActionListeners()) {
+            foundOrLostButton.removeActionListener(al);
+        }
+
+        // Set button text and style based on status
+        if (data[6].equals("Lost")) {
+            foundOrLostButton.setText("I found this");
+            foundOrLostButton.setBackground(Color.decode("#006400")); // Dark green
+            foundOrLostButton.setForeground(Color.WHITE);
+        } else { // Found
+            foundOrLostButton.setText("This is mine");
+            foundOrLostButton.setBackground(Color.decode("#FFD700")); // Gold
+            foundOrLostButton.setForeground(Color.decode("#800000")); // Maroon
+        }
+
+        foundOrLostButton.setOpaque(true);
+        foundOrLostButton.setBorderPainted(false);
+        foundOrLostButton.setFocusPainted(false);
+
+        // Add new action listener with current data
+        foundOrLostButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        data[1] + " is now notified\nWait for a reply",
+                        "Notification Sent",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
+    }
+
+    private void populateItemDetails(String[] data, JScrollPane detailsHolder) {
+        // Create a main panel to hold all details
+        JPanel mainDetailsPanel = new JPanel();
+        mainDetailsPanel.setLayout(new BoxLayout(mainDetailsPanel, BoxLayout.Y_AXIS));
+        mainDetailsPanel.setBackground(Color.WHITE);
+        mainDetailsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // ROW 1: PICTURE - CENTER, FILL WIDTH, ADAPT HEIGHT with border
+        if (data.length > 8 && !data[8].equals("N/A")) {
+            try {
+                File imageFile = new File("assets/reportedItems/" + data[8]);
+                if (imageFile.exists()) {
+                    ImageIcon imageIcon = new ImageIcon(imageFile.getAbsolutePath());
+
+                    // Get the actual viewport width to prevent horizontal scrolling
+                    int viewportWidth = detailsHolder.getViewport().getWidth();
+                    // Account for padding (20 left + 20 right) and border (2 per side)
+                    int maxWidth = viewportWidth - 44;
+
+                    // Ensure minimum reasonable width
+                    if (maxWidth < 100) maxWidth = 400;
+
+                    int originalWidth = imageIcon.getIconWidth();
+                    int originalHeight = imageIcon.getIconHeight();
+
+                    // Scale to fit width while preserving aspect ratio
+                    double scale = (double) maxWidth / originalWidth;
+                    int newWidth = maxWidth;
+                    int newHeight = (int) (originalHeight * scale);
+
+                    Image scaledImage = imageIcon.getImage().getScaledInstance(
+                            newWidth, newHeight, Image.SCALE_SMOOTH);
+
+                    JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
+                    imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                    imageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+
+                    // Wrap in a panel to ensure centering
+                    JPanel imagePanel = new JPanel();
+                    imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.X_AXIS));
+                    imagePanel.setBackground(Color.WHITE);
+                    imagePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    imagePanel.add(Box.createHorizontalGlue());
+                    imagePanel.add(imageLabel);
+                    imagePanel.add(Box.createHorizontalGlue());
+
+                    mainDetailsPanel.add(imagePanel);
+                    mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+                }
+            } catch (Exception e) {
+                // No image or error loading
+            }
+        }
+
+        // Status message with reportedBy
+        String statusMessage;
+        Color statusColor;
+        if (data[6].equals("Found")) {
+            statusMessage = "This item is missing its owner";
+            statusColor = Color.RED;
+        } else {
+            statusMessage = data[1] + " lost this item";
+            statusColor = Color.RED;
+        }
+
+        JLabel statusLabel = new JLabel(statusMessage);
+        statusLabel.setFont(new Font("Arial", Font.BOLD, 15));
+        statusLabel.setForeground(statusColor);
+        statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainDetailsPanel.add(statusLabel);
+        mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        // ROW 3: Item Name
+        JLabel nameLabel = new JLabel("Item Name: " + data[2]);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainDetailsPanel.add(nameLabel);
+        mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // ROW 4: Description (with word wrap to prevent horizontal scroll)
+        JTextArea descriptionArea = new JTextArea("Description: " + data[5]);
+        descriptionArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setEditable(false);
+        descriptionArea.setBackground(Color.WHITE);
+        descriptionArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Calculate max width to prevent horizontal scrolling
+        int viewportWidth = detailsHolder.getViewport().getWidth();
+        int maxTextWidth = viewportWidth - 44; // Account for padding
+        if (maxTextWidth < 100) maxTextWidth = 400;
+        descriptionArea.setMaximumSize(new Dimension(maxTextWidth, Integer.MAX_VALUE));
+
+        mainDetailsPanel.add(descriptionArea);
+        mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // ROW 5: Last Seen Location and Time
+        JLabel locationLabel = new JLabel("Item last seen: " + data[3] + " on " + data[4]);
+        locationLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        locationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainDetailsPanel.add(locationLabel);
+        mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Category
+        JLabel categoryLabel = new JLabel("Category: " + data[7]);
+        categoryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        categoryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainDetailsPanel.add(categoryLabel);
+        mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        // ROW N: Additional Details (if not N/A)
+        if (data.length > 9) {
+            JLabel additionalHeader = new JLabel("Additional Details:");
+            additionalHeader.setFont(new Font("Arial", Font.BOLD, 16));
+            additionalHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
+            mainDetailsPanel.add(additionalHeader);
+            mainDetailsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+            addCategorySpecificDetails(data, mainDetailsPanel);
+        }
+
+        // Add glue at the bottom to push everything to the top
+        mainDetailsPanel.add(Box.createVerticalGlue());
+
+        // Set the panel as the viewport view
+        detailsHolder.setViewportView(mainDetailsPanel);
+        detailsHolder.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        detailsHolder.revalidate();
+        detailsHolder.repaint();
+    }
+
+    private void addCategorySpecificDetails(String[] data, JPanel panel) {
+        String category = data[7];
+        int startIndex = 9; // Where additional fields begin
+
+        switch (category) {
+            case "Accessory":
+                addDetailIfNotNA(panel, "Color", data, startIndex);
+                addDetailIfNotNA(panel, "Material", data, startIndex + 1);
+                addDetailIfNotNA(panel, "Type", data, startIndex + 2);
+                break;
+
+            case "Bag":
+                addDetailIfNotNA(panel, "Color", data, startIndex);
+                addDetailIfNotNA(panel, "Brand", data, startIndex + 1);
+                addDetailIfNotNA(panel, "Type", data, startIndex + 2);
+                break;
+
+            case "Clothing":
+                addDetailIfNotNA(panel, "Color", data, startIndex);
+                addDetailIfNotNA(panel, "Size", data, startIndex + 1);
+                addDetailIfNotNA(panel, "Brand", data, startIndex + 2);
+                addDetailIfNotNA(panel, "Material", data, startIndex + 3);
+                addDetailIfNotNA(panel, "Type", data, startIndex + 4);
+                break;
+
+            case "Document":
+                addDetailIfNotNA(panel, "Owner Name", data, startIndex);
+                addDetailIfNotNA(panel, "Owner ID", data, startIndex + 1);
+                addDetailIfNotNA(panel, "Document Type", data, startIndex + 2);
+                break;
+
+            case "Electronic":
+                addDetailIfNotNA(panel, "Model", data, startIndex);
+                addDetailIfNotNA(panel, "Brand", data, startIndex + 1);
+                addDetailIfNotNA(panel, "Type", data, startIndex + 2);
+                break;
+
+            case "Food Container":
+                addDetailIfNotNA(panel, "Color", data, startIndex);
+                addDetailIfNotNA(panel, "Capacity", data, startIndex + 1);
+                addDetailIfNotNA(panel, "Brand", data, startIndex + 2);
+                addDetailIfNotNA(panel, "Type", data, startIndex + 3);
+                break;
+
+            case "Money":
+                addDetailIfNotNA(panel, "Amount", data, startIndex);
+                addDetailIfNotNA(panel, "In Wallet", data, startIndex + 1);
+                break;
+
+            case "Tumbler":
+                addDetailIfNotNA(panel, "Color", data, startIndex);
+                addDetailIfNotNA(panel, "Capacity", data, startIndex + 1);
+                break;
+
+            case "Others":
+                addDetailIfNotNA(panel, "Item Type", data, startIndex);
+                addDetailIfNotNA(panel, "Color", data, startIndex + 1);
+                break;
+        }
+    }
+
+    private void addDetailIfNotNA(JPanel panel, String label, String[] data, int index) {
+        if (data.length > index && !data[index].equals("N/A")) {
+            JLabel detailLabel = new JLabel("• " + label + ": " + data[index]);
+            detailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+            detailLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(detailLabel);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+    }
+
     //create individual items
-    private static JPanel createItemPanel(String[] data) {
+    private JPanel createItemPanel(String[] data) {
         JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(200, 200));
+        panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        // Add hover effect
+        panel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Add click listener
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                goToItemDetails(data, lostItemsButton, reportAnItemButton, profileButton, detailsHolder);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                panel.setBackground(Color.decode("#F5F5F5"));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                panel.setBackground(Color.WHITE);
+            }
+        });
+
+        //JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(200, 200)); // Increased height for image
         panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         panel.setBackground(Color.WHITE);
@@ -902,7 +1192,7 @@ public class LFForm extends JFrame {
                         if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") ||
                                 fileName.endsWith(".png") || fileName.endsWith(".gif")) {
 
-                            // In setupImageDragAndDrop(), after validation:
+
                             uploadedImageFilePath = imageFile.getAbsolutePath();
                             String extension = fileName.substring(fileName.lastIndexOf("."));
                             uploadedImageFileName = extension;
@@ -1182,6 +1472,12 @@ public class LFForm extends JFrame {
 
         //Encodes users from file
         system.encodeUsersFromFile();
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
+            }
+        });
+
         //setup Panel
         imagePreviewLabel.setText("Drag & Drop Image Here");
         imagePreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1205,7 +1501,11 @@ public class LFForm extends JFrame {
         itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
         setUpItemCategoryBox(itemCategoryBox);
         setupImageDragAndDrop();
-        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
+        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15);//n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
         scrollableDetails.getVerticalScrollBar().setUnitIncrement(15);
+        backButton.setOpaque(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setBorderPainted(false);
+        detailsHolder.getVerticalScrollBar().setUnitIncrement(15);
     }
 }
