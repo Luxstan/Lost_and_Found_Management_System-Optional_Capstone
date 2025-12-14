@@ -13,7 +13,7 @@ public class Electronic extends ColoredItem{
         this.material = material;
         this.type = type;
     }
-
+    public Electronic(){}
     public String getBrand(){
         return brand;
     }

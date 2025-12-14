@@ -1,5 +1,8 @@
 import ItemPack.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -10,6 +13,9 @@ public class LFSystem {
     public ArrayList<Item> foundList;
     public ArrayList<Item> historyList; //MIGHT NOT NEED THIS
 
+    User current_user = null;
+    int user_index = 0;
+    boolean valid = false;
     public int item_id = 1;
 
     public LFSystem(){
@@ -20,13 +26,22 @@ public class LFSystem {
     }
 
     //Methods
-    public void addLostItem(Item a){}
+    /*public void addLostItem(Item a){}
     public void addFoundItem(Item a){}
-    public void searchItem(Item a){}
+    public void searchItem(Item a){}*/
 
     public void createUser(String name, String id, String pass, String contactNo, String course, int year){
+        //First looks if it is not a duplicate. Returns and does nothing if it is a dupe.
+        for(User a : userList){
+            if(a.getId().equals(id) && a.getPassword().equals(pass)){
+                return;
+            }
+        }
+
+        //If not, then the user will be created.
         User user = new User(name, id, pass, contactNo, course, year);
         userList.add(user);
+        System.out.println("User created: " + name + " " + id + " " + pass + " " + contactNo + " " + course + "-" + year);
     }
 
     public void printUserList(){
@@ -216,6 +231,10 @@ public class LFSystem {
         return null;
     }
 
+    void handleReporting(){
+
+    }
+
     //TEST FOR THE SYSTEM'S PROCESS, u might be able to use code here and integrate it into the form!
     /* Bare with me, but I love documenting, so I'll explain the process, may be useful when integrating in your system.
         THE MAIN INTERFACE:
@@ -295,12 +314,22 @@ public class LFSystem {
         } while (!input.equals("4"));
     }
 
+    public boolean validateUser(String id, String pass){
+        for(User a : userList){
+            if(a.getId().equals(id) && a.getPassword().equals(pass)){
+                current_user = a;
+                user_index = userList.indexOf(a);
+                valid = true;
+                break;
+            }
+        }
+        return valid;
+    }
+
     //This will run correctly if there is a valid id match inside the user list
     public void runSystem(String id, String pass){
         String input ="";
-        User user = null;
-        int user_index = 0;
-        boolean valid = false;
+
 
         //Validate id and pass
         if(id.equals("ADMIN") && pass.equals("12345") && userList.isEmpty()){
@@ -311,21 +340,19 @@ public class LFSystem {
 
         for(User a : userList){
             if(a.getId().equals(id) && a.getPassword().equals(pass)){
-                user = a;
+                current_user = a;
                 user_index = userList.indexOf(a);
                 valid = true;
                 break;
             }
         }
 
-
-
-        if(!valid || user == null){
+        if(!valid || current_user == null){
             System.out.println("USERNAME OR PASSWORD INCORRECT");
             return;
         }
 
-        String user_name = user.getName().toUpperCase();
+        String user_name = current_user.getName().toUpperCase();
         //Access menu
         while(true){
             System.out.println("WELCOME, " + user_name);
@@ -338,20 +365,20 @@ public class LFSystem {
             switch(input){
                 case "1" :
                     System.out.println("YOU HAVE LOST AN ITEM AND WISH TO REPORT IT...");
-                    lostList.add(reportItem(user, "REPORT LOST"));
+                    lostList.add(reportItem(current_user, "REPORT LOST"));
                     break;
                 case "2":
                     System.out.println("YOU HAVE FOUND AN ITEM AND WISH TO REPORT IT...");
-                    lostList.add(reportItem(user, "REPORT FOUND"));
+                    lostList.add(reportItem(current_user, "REPORT FOUND"));
                     break;
                 case "3":
                     System.out.println("DISPLAYING " + user_name + "'S ITEMS LOST...");
-                    user.displayList("LOST");
+                    current_user.displayList("LOST");
                     break;
                 case "4":
                     System.out.println("DISPLAYING " + user_name + "'S ITEMS FOUND...");
                     System.out.println("The items here are yet to be claimed");
-                    user.displayList("FOUND");
+                    current_user.displayList("FOUND");
                     break;
                 case "5":
                     System.out.println("EXITING...");
@@ -361,5 +388,85 @@ public class LFSystem {
                     break;
             }
         }
+    }
+
+    public void encodeUsersFromFile(){ //This method creates [new] users based from the csv file. Acts like a "load".
+        String[] user_details;
+        String curr;
+        try (BufferedReader br = new BufferedReader(new FileReader("records.csv"))) {
+            while ((curr = br.readLine()) != null) {
+                user_details = curr.split(",");
+                String[] courseAndYear = user_details[4].split("-");
+                String course = courseAndYear[0];
+                int year = Integer.parseInt(courseAndYear[1]);
+                createUser(user_details[0], user_details[2], user_details[1], user_details[3], course, year);
+            }
+        } catch (IOException ignored) {}
+    }
+
+    public String displayUserLostList(){
+        //current_user.displayList("LOST");
+        return current_user.outputItemName("LOST");
+    }
+
+    public String displayUserFoundList(){
+        //current_user.displayList("FOUND");
+        return current_user.outputItemName("FOUND");
+    }
+
+    public void createItem(String status, String item_name, String details, String lastSeenAt, String reportedBy, int category){
+        System.out.println(category);
+        /*
+        There are 0-9 Categories in the combo box
+        Accessory
+        Bag
+        Clothing
+        Document
+        Electronic
+        Food Container
+        Money
+        Tumbler
+        Others
+        */
+        Item a = null;
+        switch(category){
+            case 1:
+                a = new Accessory();
+            case 2:
+                a = new Bag();
+            case 3:
+                a = new Clothing();
+            case 4:
+                a = new Document();
+            case 5:
+                a = new Electronic();
+            case 6:
+                a = new FoodContainer();
+            case 7:
+                a = new Money();
+            case 8:
+                a = new FoodContainer();
+            case 9:
+                a = new Miscellaneous();
+            default:
+                break;
+        }
+        if(a == null){
+            System.out.println("ERROR. ITEM IS NULL.");
+            return;
+        }
+        a.setItemID(item_id);
+        a.setItemName(item_name);
+        a.setDetails(details);
+        a.setLastLocationSeen(lastSeenAt);
+        if(status.equals("Lost")){
+            current_user.addLostItem(a);
+        }
+        else if(status.equals("Found")){
+            a.setFoundBy(reportedBy);
+            current_user.addFoundItem(a);
+        }
+
+
     }
 }

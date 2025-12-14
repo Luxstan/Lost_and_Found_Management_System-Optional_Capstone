@@ -8,6 +8,7 @@ public class Money extends Item{
         this.amount = amount;
         this.inWallet = inWallet;
     }
+    public Money(){}
 
     //Setters and Getters
     public double getAmount(){

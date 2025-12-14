@@ -40,6 +40,28 @@ public class User {
         foundList.removeIf(a -> a.getItemName().equalsIgnoreCase(item_id));
     }
 
+    public String outputItemName(String option){
+        String ret = "";
+        int ctr = 1;
+        if(option.equals("LOST")){
+            for(Item a : lostList){
+                ret += ctr + ": " + a.getItemName() + " [" + a.getItemID() + "]";
+                if(ctr != lostList.size()){
+                    ret += "\n";
+                }
+                ctr++;
+            }
+        } else if (option.equals("FOUND")) {
+            for(Item a : foundList){
+                ret += ctr + ": " + a.getItemName() + " [" + a.getItemID() + "]";
+                if(ctr != foundList.size()){
+                    ret += "\n";
+                }
+                ctr++;
+            }
+        }
+        return ret;
+    }
     public void displayList(String option){
         if(option.equals("LOST")){
             for(Item a : lostList){

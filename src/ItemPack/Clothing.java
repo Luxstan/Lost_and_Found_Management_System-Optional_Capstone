@@ -13,6 +13,7 @@ public class Clothing extends ColoredItem implements Wearable{
         this.material = material;
         this.type = type;
     }
+    public Clothing(){}
     //Setters and Getters
     public String getSize(){return size;}
     public String getType() {return type;}

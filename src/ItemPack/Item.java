@@ -32,6 +32,7 @@ public class Item {
     public void setLastLocationSeen(String lastLocationSeen){
         this.lastLocationSeen = lastLocationSeen;
     }
+    public void setFoundBy(String foundBy){this.foundBy = foundBy;}
 
     public int getItemID(){
         return itemID;

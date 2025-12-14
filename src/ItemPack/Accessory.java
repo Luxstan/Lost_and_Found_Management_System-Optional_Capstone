@@ -10,6 +10,8 @@ public class Accessory extends ColoredItem implements Wearable{
         this.type = type;
     }
 
+    public Accessory(){}
+
     //Setters and Getters
     public String getColor(){return color;}
     public String getMaterial(){
