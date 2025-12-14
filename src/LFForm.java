@@ -1478,6 +1478,6 @@ public class LFForm extends JFrame {
         backButton.setOpaque(false);
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
-        scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15);
+        detailsHolder.getVerticalScrollBar().setUnitIncrement(15);
     }
 }
