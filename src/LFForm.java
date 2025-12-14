@@ -18,6 +18,7 @@ public class LFForm extends JFrame {
 
     //LFSystem
     LFSystem system = new LFSystem();
+    User current_user;
 
     //track current user
     String[] user; //Note that we should also use the USER LIST and stuff from the system object
@@ -75,6 +76,10 @@ public class LFForm extends JFrame {
     private JLabel profileLabel;
     //4.1.1 PANEL
 
+    private JLabel userIDLabel;
+    private JLabel userName;
+    private JLabel userContactNum;
+    private JLabel userCourseYear;
 
     //5 MESSAGE THE OWNER PAGE
     private JPanel messageTheOwnerPage;
@@ -112,6 +117,11 @@ public class LFForm extends JFrame {
     private JButton lostButton;
     private JPanel imageDropZone;
     private JLabel imagePreviewLabel;
+    private JButton editInformationButton;
+    private JPanel ProfileDetailsContainer;
+    private JPanel EditInformationButtonContainer;
+    private JPanel UserHistoryContainer;
+
     private String uploadedImageFileName = ""; // stores just the filename
 
     private JButton submitReportButton;
@@ -325,8 +335,9 @@ public class LFForm extends JFrame {
         markUnselected(profileButton);
     }
 
-    public void goToProfile(String[] user, JButton lostItemsButton, JButton reportAnItemButtonButton, JButton profileButton) {
+    public void goToProfile(String[] user) {
         hideAll();
+        setProfilePage();
         profilePage.setVisible(true);
 
         if(!constantPanel.isVisible()){
@@ -336,14 +347,21 @@ public class LFForm extends JFrame {
             greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
         }
         markUnselected(lostItemsButton);
-        markUnselected(reportAnItemButtonButton);
+        markUnselected(reportAnItemButton);
         markSelected(profileButton);
+    }
+
+    public void setProfilePage(){
+        userIDLabel.setText("ID Number: " + system.current_user.getId());
+        userName.setText("Username: " + system.current_user.getName());
+        userContactNum.setText("Contact Number: " + system.current_user.getContactNo());
+        userCourseYear.setText("Course and Year: " + system.current_user.getCourse() + "-" + system.current_user.getYear());
     }
 
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
     //CSV format: username,password,IDNumber,contactNumber,courseAndYear
     //indices:      [0]      [1]       [2]        [3]          [4]
-    public static String[] findAccount(String findThis, String findThroughWhat){
+    public String[] findAccount(String findThis, String findThroughWhat){
         String[] currentIDNumber;
         String curr;
         int findThrough = switch (findThroughWhat) {
@@ -370,7 +388,7 @@ public class LFForm extends JFrame {
 
     //Record new registered account using this function
     //CSV format would be username,password,IDNumber,contactNumber,courseAndYear
-    public static void recordAccount(String username, String password, String IDNumber, String contactNumber, String courseAndYear) throws EmptyField, InvalidIDFormat, InvalidNumberFormat, InvalidCourseAndYearFormat {
+    public void recordAccount(String username, String password, String IDNumber, String contactNumber, String courseAndYear) throws EmptyField, InvalidIDFormat, InvalidNumberFormat, InvalidCourseAndYearFormat {
         if (username.isEmpty()) throw new EmptyField("Username");
         if (password.isEmpty()) throw new EmptyField("Password");
         if (IDNumber.isEmpty()) throw new EmptyField("ID Number");
@@ -385,6 +403,13 @@ public class LFForm extends JFrame {
             bw.write(username + "," + password + "," + IDNumber + "," + contactNumber + "," + courseAndYear);
             bw.newLine();
         } catch (IOException ignored) {}
+
+        String[] parts = courseAndYear.split("-");
+        String course = parts[0];
+        int year = Integer.parseInt(parts[1]);
+
+        //PLACE THE USER INTO THE USER LIST INSIDE THE SYSTEM
+        system.createUser(username, IDNumber, password, contactNumber, course, year);
     }
 
     //tabs color changer
@@ -976,6 +1001,10 @@ public class LFForm extends JFrame {
                     switch (finalButton.getText()) {
                         //LOGGING IN WITH USERNAME AND PASSWORD
                         case "Login":
+
+                            if(!system.validateUser(user[2], user[1])){ //ID and PASSWORD
+                                System.out.println("ERROR DETECTED IN LOGIN BUTTON ACCESSING LFSYSTEM. USER NOT FOUND.");
+                            }
                             if (onRecord!=null) {
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
                                     goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
@@ -1024,7 +1053,7 @@ public class LFForm extends JFrame {
 
         profileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToProfile(user, lostItemsButton, reportAnItemButton, profileButton);
+                goToProfile(user);
             }
         });
 

@@ -10,6 +10,9 @@ public class LFSystem {
     public ArrayList<Item> foundList;
     public ArrayList<Item> historyList; //MIGHT NOT NEED THIS
 
+    User current_user = null;
+    int user_index = 0;
+    boolean valid = false;
     public int item_id = 1;
 
     public LFSystem(){
@@ -17,6 +20,9 @@ public class LFSystem {
         foundList = new ArrayList<>();
         historyList = new ArrayList<>();
         userList = new ArrayList<>();
+
+        createUser("fwae", "24-4941-979" , "fwae" , "09999999999" , "BSCpE" , 4);
+
     }
 
     //Methods
@@ -27,6 +33,7 @@ public class LFSystem {
     public void createUser(String name, String id, String pass, String contactNo, String course, int year){
         User user = new User(name, id, pass, contactNo, course, year);
         userList.add(user);
+        System.out.println("User created: " + name + " " + id + " " + pass + " " + contactNo + " " + course + "-" + year);
     }
 
     public void printUserList(){
@@ -216,6 +223,10 @@ public class LFSystem {
         return null;
     }
 
+    void handleReporting(){
+
+    }
+
     //TEST FOR THE SYSTEM'S PROCESS, u might be able to use code here and integrate it into the form!
     /* Bare with me, but I love documenting, so I'll explain the process, may be useful when integrating in your system.
         THE MAIN INTERFACE:
@@ -295,12 +306,22 @@ public class LFSystem {
         } while (!input.equals("4"));
     }
 
+    public boolean validateUser(String id, String pass){
+        for(User a : userList){
+            if(a.getId().equals(id) && a.getPassword().equals(pass)){
+                current_user = a;
+                user_index = userList.indexOf(a);
+                valid = true;
+                break;
+            }
+        }
+        return valid;
+    }
+
     //This will run correctly if there is a valid id match inside the user list
     public void runSystem(String id, String pass){
         String input ="";
-        User user = null;
-        int user_index = 0;
-        boolean valid = false;
+
 
         //Validate id and pass
         if(id.equals("ADMIN") && pass.equals("12345") && userList.isEmpty()){
@@ -311,21 +332,19 @@ public class LFSystem {
 
         for(User a : userList){
             if(a.getId().equals(id) && a.getPassword().equals(pass)){
-                user = a;
+                current_user = a;
                 user_index = userList.indexOf(a);
                 valid = true;
                 break;
             }
         }
 
-
-
-        if(!valid || user == null){
+        if(!valid || current_user == null){
             System.out.println("USERNAME OR PASSWORD INCORRECT");
             return;
         }
 
-        String user_name = user.getName().toUpperCase();
+        String user_name = current_user.getName().toUpperCase();
         //Access menu
         while(true){
             System.out.println("WELCOME, " + user_name);
@@ -338,20 +357,20 @@ public class LFSystem {
             switch(input){
                 case "1" :
                     System.out.println("YOU HAVE LOST AN ITEM AND WISH TO REPORT IT...");
-                    lostList.add(reportItem(user, "REPORT LOST"));
+                    lostList.add(reportItem(current_user, "REPORT LOST"));
                     break;
                 case "2":
                     System.out.println("YOU HAVE FOUND AN ITEM AND WISH TO REPORT IT...");
-                    lostList.add(reportItem(user, "REPORT FOUND"));
+                    lostList.add(reportItem(current_user, "REPORT FOUND"));
                     break;
                 case "3":
                     System.out.println("DISPLAYING " + user_name + "'S ITEMS LOST...");
-                    user.displayList("LOST");
+                    current_user.displayList("LOST");
                     break;
                 case "4":
                     System.out.println("DISPLAYING " + user_name + "'S ITEMS FOUND...");
                     System.out.println("The items here are yet to be claimed");
-                    user.displayList("FOUND");
+                    current_user.displayList("FOUND");
                     break;
                 case "5":
                     System.out.println("EXITING...");
