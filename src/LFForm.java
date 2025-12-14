@@ -207,9 +207,6 @@ public class LFForm extends JFrame {
         if(!constantPanel.isVisible()){
             constantPanel.setVisible(true);
         }
-        if(greetingsLabel.getText().equals("Change This")){
-            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
-        }
         markSelected(lostItemsButton);
         markUnselected(reportAnItemButtonButton);
         markUnselected(profileButton);
@@ -327,24 +324,18 @@ public class LFForm extends JFrame {
         if(!constantPanel.isVisible()){
             constantPanel.setVisible(true);
         }
-        if(greetingsLabel.getText().equals("Change This")){
-            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
-        }
         markUnselected(lostItemsButton);
         markSelected(reportAnItemButtonButton);
         markUnselected(profileButton);
     }
 
-    public void goToProfile(String[] user) {
+    public void goToProfile() {
         hideAll();
         setProfilePage();
         profilePage.setVisible(true);
 
         if(!constantPanel.isVisible()){
             constantPanel.setVisible(true);
-        }
-        if(greetingsLabel.getText().equals("Change This")){
-            greetingsLabel.setText("Welcome " + user[0] + "! (" +  user[2] + ")");
         }
         markUnselected(lostItemsButton);
         markUnselected(reportAnItemButton);
@@ -357,6 +348,7 @@ public class LFForm extends JFrame {
         userContactNum.setText("Contact Number: " + system.current_user.getContactNo());
         userCourseYear.setText("Course and Year: " + system.current_user.getCourse() + "-" + system.current_user.getYear());
     }
+
 
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
     //CSV format: username,password,IDNumber,contactNumber,courseAndYear
@@ -1002,10 +994,11 @@ public class LFForm extends JFrame {
                         //LOGGING IN WITH USERNAME AND PASSWORD
                         case "Login":
 
-                            if(!system.validateUser(user[2], user[1])){ //ID and PASSWORD
-                                System.out.println("ERROR DETECTED IN LOGIN BUTTON ACCESSING LFSYSTEM. USER NOT FOUND.");
-                            }
                             if (onRecord!=null) {
+                                if(!system.validateUser(user[2], user[1])){ //ID and PASSWORD
+                                    System.out.println("ERROR DETECTED IN LOGIN BUTTON ACCESSING LFSYSTEM. USER NOT FOUND.");
+                                }
+
                                 if (Objects.equals(enteredPassword, onRecord[1])) {
                                     goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);
                                     clearEntriesButton.doClick();
@@ -1014,6 +1007,11 @@ public class LFForm extends JFrame {
                                 }
                             } else {
                                 throw new UsernameNotFound();
+                            }
+
+                            //Setting up the Constant Banner
+                            if(greetingsLabel.getText().equals("Change This")){
+                                greetingsLabel.setText("Welcome " + system.current_user.getName() + "! (" +  system.current_user.getId() + ")");
                             }
                             break;
                         //REGISTERING NEW ACCOUNT
@@ -1053,7 +1051,7 @@ public class LFForm extends JFrame {
 
         profileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                goToProfile(user);
+                goToProfile();
             }
         });
 
@@ -1183,6 +1181,8 @@ public class LFForm extends JFrame {
             }
         });
 
+        //Encodes users from file
+        system.encodeUsersFromFile();
         //setup Panel
         imagePreviewLabel.setText("Drag & Drop Image Here");
         imagePreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);

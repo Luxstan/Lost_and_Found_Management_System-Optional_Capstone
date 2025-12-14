@@ -1,5 +1,8 @@
 import ItemPack.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -31,6 +34,14 @@ public class LFSystem {
     public void searchItem(Item a){}
 
     public void createUser(String name, String id, String pass, String contactNo, String course, int year){
+        //First looks if it is not a duplicate. Returns and does nothing if it is a dupe.
+        for(User a : userList){
+            if(a.getId().equals(id) && a.getPassword().equals(pass)){
+                return;
+            }
+        }
+
+        //If not, then the user will be created.
         User user = new User(name, id, pass, contactNo, course, year);
         userList.add(user);
         System.out.println("User created: " + name + " " + id + " " + pass + " " + contactNo + " " + course + "-" + year);
@@ -380,5 +391,19 @@ public class LFSystem {
                     break;
             }
         }
+    }
+
+    public void encodeUsersFromFile(){ //This method creates [new] users based from the csv file. Acts like a "load".
+        String[] user_details;
+        String curr;
+        try (BufferedReader br = new BufferedReader(new FileReader("records.csv"))) {
+            while ((curr = br.readLine()) != null) {
+                user_details = curr.split(",");
+                String[] courseAndYear = user_details[4].split("-");
+                String course = courseAndYear[0];
+                int year = Integer.parseInt(courseAndYear[1]);
+                createUser(user_details[0], user_details[2], user_details[1], user_details[3], course, year);
+            }
+        } catch (IOException ignored) {}
     }
 }
