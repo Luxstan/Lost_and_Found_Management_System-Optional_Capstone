@@ -1176,7 +1176,7 @@ public class LFForm extends JFrame {
                         if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") ||
                                 fileName.endsWith(".png") || fileName.endsWith(".gif")) {
 
-                            // In setupImageDragAndDrop(), after validation:
+
                             uploadedImageFilePath = imageFile.getAbsolutePath();
                             String extension = fileName.substring(fileName.lastIndexOf("."));
                             uploadedImageFileName = extension;
