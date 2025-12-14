@@ -92,25 +92,56 @@ public class LFForm extends JFrame {
     private JTextField inputLostItemName;
     //7.1 PANEL
 
-    private JLabel lostItemNameLabel;
-    private JLabel lastSeenAtLabel;
-    private JLabel lastSeenOnLabel;
-    private JLabel descriptionLabel;
     private JTextField inputLastSeenAt;
     private JTextField inputLastSeenOn;
     private JTextField inputDescription;
     private JPanel mainFieldsHolder;
     private JComboBox itemCategoryBox;
+    private JPanel additionalDetailsPanel;
+    private JScrollPane scrollableDetails;
+    private JRadioButton inWalletRadio;
+    private JRadioButton notInWalletRadio;
+    private JButton foundButton;
+    private JButton lostButton;
 
-    //Additonal details panels
-    private JPanel accessoryAdditionalDetails;
-    private JPanel bagAdditionalDetails;
-    private JPanel clothingAdditionalDetails;
-    private JPanel documentAdditionalDetails;
-    private JPanel electronicAdditionalDetails;
-    private JPanel foodContainerAdditionalDetails;
-    private JPanel moneyAdditionalDetails;
-    private JPanel wearableElectronicAdditionalDetails;
+    private JButton submitReportButton;
+
+    // Dynamic fields
+    private JTextField accessoryColor;
+    private JTextField accessoryMaterial;
+    private JTextField accessoryType;
+
+    private JTextField bagColor;
+    private JTextField bagBrand;
+    private JTextField bagType;
+
+    private JTextField clothingColor;
+    private JTextField clothingSize;
+    private JTextField clothingBrand;
+    private JTextField clothingMaterial;
+    private JTextField clothingType;
+
+    private JTextField documentOwnerName;
+    private JTextField documentOwnerID;
+    private JTextField documentType;
+
+    private JTextField electronicModel;
+    private JTextField electronicBrand;
+    private JTextField electronicType;
+
+    private JTextField foodContainerColor;
+    private JTextField foodContainerCapacity;
+    private JTextField foodContainerBrand;
+    private JTextField foodContainerType;
+
+    private JTextField moneyAmount;
+
+    private JTextField tumblerColor;
+    private JTextField tumblerCapacity;
+
+    private JTextField othersItemType;
+    private JTextField othersColor;
+
 
     //ORIGINALLY CALLED start(). All the goTo methods call this function to hide all the panels.
     //You will need to manually set the panel you are on to true though.
@@ -192,15 +223,15 @@ public class LFForm extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         // Example fields (adjust once you finalize CSV format)
-        JLabel username = new JLabel(data[0]);
+        JLabel username = new JLabel(data[1]);
         username.setForeground(Color.GRAY);
         username.setFont(new Font("Arial", Font.PLAIN, 13));
 
-        JLabel name = new JLabel(data[1]);
+        JLabel name = new JLabel(data[2]);
         name.setForeground(Color.BLACK);
         name.setFont(new Font("Arial", Font.BOLD, 17));
 
-        JLabel location = new JLabel("Last Seen: " + data[2]); //change accordingly to final csv format
+        JLabel location = new JLabel("Last Seen: " + data[3]); //change accordingly to final csv format
         location.setForeground(Color.DARK_GRAY);
         location.setFont(new Font("Arial", Font.PLAIN, 12));
 
@@ -301,9 +332,408 @@ public class LFForm extends JFrame {
         a.setOpaque(true);
     }
 
-    private static void setUpItemCategoryBox(JComboBox comboBox) {
+    private void setUpItemCategoryBox(JComboBox comboBox) {
         comboBox.addItem("Item Category");
+        comboBox.addItem("Accessory");
+        comboBox.addItem("Bag");
+        comboBox.addItem("Clothing");
+        comboBox.addItem("Document");
+        comboBox.addItem("Electronic");
+        comboBox.addItem("Food Container");
+        comboBox.addItem("Money");
+        comboBox.addItem("Tumbler");
+        comboBox.addItem("Others");
     }
+
+    //is called when comboBox selected accessory
+    private void addAccessoryFields(JPanel panel) {
+        JLabel colorLabel = new JLabel("Color:");
+        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        accessoryColor = new JTextField();
+        accessoryColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        accessoryColor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel materialLabel = new JLabel("Material:");
+        materialLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        accessoryMaterial = new JTextField();
+        accessoryMaterial.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        accessoryMaterial.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        accessoryType = new JTextField();
+        accessoryType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        accessoryType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(colorLabel);
+        panel.add(accessoryColor);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(materialLabel);
+        panel.add(accessoryMaterial);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(typeLabel);
+        panel.add(accessoryType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected bag
+    private void addBagFields(JPanel panel) {
+        JLabel colorLabel = new JLabel("Color:");
+        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bagColor = new JTextField();
+        bagColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        bagColor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel brandLabel = new JLabel("Brand:");
+        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bagBrand = new JTextField();
+        bagBrand.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        bagBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bagType = new JTextField();
+        bagType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        bagType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(colorLabel);
+        panel.add(bagColor);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(brandLabel);
+        panel.add(bagBrand);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(typeLabel);
+        panel.add(bagType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected clothing
+    private void addClothingFields(JPanel panel) {
+        JLabel colorLabel = new JLabel("Color:");
+        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clothingColor = new JTextField();
+        clothingColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        clothingColor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel sizeLabel = new JLabel("Size:");
+        sizeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clothingSize = new JTextField();
+        clothingSize.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        clothingSize.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel brandLabel = new JLabel("Brand:");
+        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clothingBrand = new JTextField();
+        clothingBrand.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        clothingBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel materialLabel = new JLabel("Material:");
+        materialLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clothingMaterial = new JTextField();
+        clothingMaterial.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        clothingMaterial.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clothingType = new JTextField();
+        clothingType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        clothingType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(colorLabel);
+        panel.add(clothingColor);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(sizeLabel);
+        panel.add(clothingSize);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(brandLabel);
+        panel.add(clothingBrand);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(materialLabel);
+        panel.add(clothingMaterial);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(typeLabel);
+        panel.add(clothingType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected document
+    private void addDocumentFields(JPanel panel) {
+        JLabel ownerNameLabel = new JLabel("Owner Name:");
+        ownerNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        documentOwnerName = new JTextField();
+        documentOwnerName.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        documentOwnerName.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel ownerIDLabel = new JLabel("Owner ID:");
+        ownerIDLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        documentOwnerID = new JTextField();
+        documentOwnerID.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        documentOwnerID.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Document Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        documentType = new JTextField();
+        documentType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        documentType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(ownerNameLabel);
+        panel.add(documentOwnerName);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(ownerIDLabel);
+        panel.add(documentOwnerID);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(typeLabel);
+        panel.add(documentType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected electronics
+    private void addElectronicFields(JPanel panel) {
+        JLabel modelLabel = new JLabel("Model:");
+        modelLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        electronicModel = new JTextField();
+        electronicModel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        electronicModel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel brandLabel = new JLabel("Brand:");
+        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        electronicBrand = new JTextField();
+        electronicBrand.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        electronicBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        electronicType = new JTextField();
+        electronicType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        electronicType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(modelLabel);
+        panel.add(electronicModel);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(brandLabel);
+        panel.add(electronicBrand);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(typeLabel);
+        panel.add(electronicType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected foodcontainer
+    private void addFoodContainerFields(JPanel panel) {
+        JLabel colorLabel = new JLabel("Color:");
+        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        foodContainerColor = new JTextField();
+        foodContainerColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        foodContainerColor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel capacityLabel = new JLabel("Capacity:");
+        capacityLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        foodContainerCapacity = new JTextField();
+        foodContainerCapacity.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        foodContainerCapacity.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel brandLabel = new JLabel("Brand:");
+        brandLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        foodContainerBrand = new JTextField();
+        foodContainerBrand.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        foodContainerBrand.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        foodContainerType = new JTextField();
+        foodContainerType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        foodContainerType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(colorLabel);
+        panel.add(foodContainerColor);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(capacityLabel);
+        panel.add(foodContainerCapacity);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(brandLabel);
+        panel.add(foodContainerBrand);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(typeLabel);
+        panel.add(foodContainerType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected money
+    private void addMoneyFields(JPanel panel) {
+        JLabel amountLabel = new JLabel("Amount:");
+        amountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        moneyAmount = new JTextField();
+        moneyAmount.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        moneyAmount.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(amountLabel);
+        panel.add(moneyAmount);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        addMoneyWalletRadioButtons(panel);
+    }
+
+    //is called when comboBox selected tumbler
+    private void addTumblerFields(JPanel panel) {
+        JLabel colorLabel = new JLabel("Color:");
+        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        tumblerColor = new JTextField();
+        tumblerColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        tumblerColor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel capacityLabel = new JLabel("Capacity:");
+        capacityLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        tumblerCapacity = new JTextField();
+        tumblerCapacity.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        tumblerCapacity.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(colorLabel);
+        panel.add(tumblerColor);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(capacityLabel);
+        panel.add(tumblerCapacity);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //is called when comboBox selected other
+    private void addOthersFields(JPanel panel) {
+        JLabel itemTypeLabel = new JLabel("Specify Item Type:");
+        itemTypeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        othersItemType = new JTextField();
+        othersItemType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        othersItemType.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel colorLabel = new JLabel("Color:");
+        colorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        othersColor = new JTextField();
+        othersColor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        othersColor.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel.add(itemTypeLabel);
+        panel.add(othersItemType);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(colorLabel);
+        panel.add(othersColor);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    private void addMoneyWalletRadioButtons(JPanel panel) {
+        JLabel label = new JLabel("In Wallet:");
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel radioPanel = new JPanel();
+        radioPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        radioPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        radioPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+
+        inWalletRadio = new JRadioButton("Yes");
+        notInWalletRadio = new JRadioButton("No");
+
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(inWalletRadio);
+        buttonGroup.add(notInWalletRadio);
+
+        radioPanel.add(inWalletRadio);
+        radioPanel.add(notInWalletRadio);
+
+        panel.add(label);
+        panel.add(radioPanel);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    //get the last report number recorded in items.csv
+    private int getNextReportNumber() {
+        int lastReportNumber = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader("Items.csv"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length > 0) {
+                        int currentNumber = Integer.parseInt(data[0]);
+                        if (currentNumber > lastReportNumber) {
+                            lastReportNumber = currentNumber;
+                        }
+                }
+            }
+        } catch(IOException e){
+            //do nothing
+        }
+
+        return lastReportNumber + 1;
+    }
+
+    private void recordReport(String reportedBy, String status, String itemName, String lastSeenAt, String lastSeenOn, String description, int categoryIndex) {
+        int reportNumber = getNextReportNumber();
+        String category = (String) itemCategoryBox.getItemAt(categoryIndex);
+
+        String reportData = reportNumber + "," + reportedBy + "," + itemName + "," + lastSeenAt + "," + lastSeenOn + "," + description + "," + status + "," + category;
+
+        switch (categoryIndex) {
+            case 1: // Accessory
+                reportData = reportData + "," + (accessoryColor.getText().isEmpty() ? "N/A" : accessoryColor.getText()) + "," + (accessoryMaterial.getText().isEmpty() ? "N/A" : accessoryMaterial.getText()) + "," + (accessoryType.getText().isEmpty() ? "N/A" : accessoryType.getText());
+                break;
+            case 2: // Bag
+                reportData = reportData + "," + (bagColor.getText().isEmpty() ? "N/A" : bagColor.getText()) + "," + (bagBrand.getText().isEmpty() ? "N/A" : bagBrand.getText()) + "," + (bagType.getText().isEmpty() ? "N/A" : bagType.getText());
+                break;
+            case 3: // Clothing
+                reportData = reportData + "," + (clothingColor.getText().isEmpty() ? "N/A" : clothingColor.getText()) + "," + (clothingSize.getText().isEmpty() ? "N/A" : clothingSize.getText()) + "," + (clothingBrand.getText().isEmpty() ? "N/A" : clothingBrand.getText()) + "," + (clothingMaterial.getText().isEmpty() ? "N/A" : clothingMaterial.getText()) + "," + (clothingType.getText().isEmpty() ? "N/A" : clothingType.getText());
+                break;
+            case 4: // Document
+                reportData = reportData + "," + (documentOwnerName.getText().isEmpty() ? "N/A" : documentOwnerName.getText()) + "," + (documentOwnerID.getText().isEmpty() ? "N/A" : documentOwnerID.getText()) + "," + (documentType.getText().isEmpty() ? "N/A" : documentType.getText());
+                break;
+            case 5: // Electronic
+                reportData = reportData + "," + (electronicModel.getText().isEmpty() ? "N/A" : electronicModel.getText()) + "," + (electronicBrand.getText().isEmpty() ? "N/A" : electronicBrand.getText()) + "," + (electronicType.getText().isEmpty() ? "N/A" : electronicType.getText());
+                break;
+            case 6: // Food Container
+                reportData = reportData + "," + (foodContainerColor.getText().isEmpty() ? "N/A" : foodContainerColor.getText()) + "," + (foodContainerCapacity.getText().isEmpty() ? "N/A" : foodContainerCapacity.getText()) + "," + (foodContainerBrand.getText().isEmpty() ? "N/A" : foodContainerBrand.getText()) + "," + (foodContainerType.getText().isEmpty() ? "N/A" : foodContainerType.getText());
+                break;
+            case 7: // Money
+                String inWallet = "N/A";
+                if (inWalletRadio != null && notInWalletRadio != null) {
+                    if (inWalletRadio.isSelected()) inWallet = "Yes";
+                    else if (notInWalletRadio.isSelected()) inWallet = "No";
+                }
+                reportData = reportData + "," + (moneyAmount.getText().isEmpty() ? "N/A" : moneyAmount.getText()) +
+                        "," + inWallet;
+                break;
+            case 8: // Tumbler
+                reportData = reportData + "," + (tumblerColor.getText().isEmpty() ? "N/A" : tumblerColor.getText()) +
+                        "," + (tumblerCapacity.getText().isEmpty() ? "N/A" : tumblerCapacity.getText());
+                break;
+            case 9: // Others
+                reportData = reportData + "," + (othersItemType.getText().isEmpty() ? "N/A" : othersItemType.getText()) +
+                        "," + (othersColor.getText().isEmpty() ? "N/A" : othersColor.getText());
+                break;
+        }
+
+        //write to csv
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("Items.csv", true))) {
+            bw.write(reportData);
+            bw.newLine();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error saving report: " + e.getMessage());
+        }
+    }
+
+    private void clearReportForm() {
+        inputLostItemName.setText("");
+        inputLastSeenAt.setText("");
+        inputLastSeenOn.setText("");
+        inputDescription.setText("");
+        itemCategoryBox.setSelectedIndex(0);
+
+        //clear fields
+        lostButton.setSelected(false);
+        foundButton.setSelected(false);
+
+        //clear panels and resize
+        additionalDetailsPanel.removeAll();
+        additionalDetailsPanel.revalidate();
+        additionalDetailsPanel.repaint();
+    }
+
+
 
 
     public LFForm() {
@@ -397,9 +827,125 @@ public class LFForm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 user = null;
 
-                //start(inputDetails, lostItemsPage, reportAnItemPage, profilePage, constantPanel, messageTheOwnerPage, itemDetailsPage);
                 goToLogin();
                 loginPage.setVisible(true);
+            }
+        });
+
+        itemCategoryBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // refresh panel
+                additionalDetailsPanel.removeAll();
+
+                //set layout for additional panels
+                additionalDetailsPanel.setLayout(new BoxLayout(additionalDetailsPanel, BoxLayout.Y_AXIS));
+
+                switch (itemCategoryBox.getSelectedIndex()) {
+                    case 0:
+                        //do nothing
+                        break;
+                    case 1: //Accessory
+                        addAccessoryFields(additionalDetailsPanel);
+                        break;
+                    case 2: //Bag
+                        addBagFields(additionalDetailsPanel);
+                        break;
+                    case 3: //Clothing
+                        addClothingFields(additionalDetailsPanel);
+                        break;
+                    case 4: //Document
+                        addDocumentFields(additionalDetailsPanel);
+                        break;
+                    case 5: //Electronic
+                        addElectronicFields(additionalDetailsPanel);
+                        break;
+                    case 6: //Food Container
+                        addFoodContainerFields(additionalDetailsPanel);
+                        break;
+                    case 7: //Money
+                        addMoneyFields(additionalDetailsPanel);
+                        break;
+                    case 8: //Tumbler
+                        addTumblerFields(additionalDetailsPanel);
+                        break;
+                    case 9: //Others
+                        addOthersFields(additionalDetailsPanel);
+                        break;
+                    default:
+                        break;
+                }
+                //refresh and resize
+                additionalDetailsPanel.revalidate();
+                additionalDetailsPanel.repaint();
+            }
+        });
+
+        lostButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (inputLostItemName.getText().isEmpty()) {
+                        throw new EmptyField("Item Name");
+                    }
+                    if (inputLastSeenAt.getText().isEmpty()) {
+                        throw new EmptyField("Last Seen At");
+                    }
+                    if (inputLastSeenOn.getText().isEmpty()) {
+                        throw new EmptyField("Last Seen On");
+                    }
+                    if (inputDescription.getText().isEmpty()) {
+                        throw new EmptyField("Description");
+                    }
+                    if (itemCategoryBox.getSelectedIndex() == 0) {
+                        JOptionPane.showMessageDialog(null, "Please select an item category");
+                        return;
+                    }
+                    //report as I lost this item
+                    recordReport(user[0], "Lost", inputLostItemName.getText(), inputLastSeenAt.getText(), inputLastSeenOn.getText(), inputDescription.getText(), itemCategoryBox.getSelectedIndex());
+
+                    int reportNum = getNextReportNumber() - 1;
+                    //validate success
+                    JOptionPane.showMessageDialog(null, "Lost item reported successfully!");
+
+                    clearReportForm();
+
+                } catch (EmptyField ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+            }
+        });
+
+        foundButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (inputLostItemName.getText().isEmpty()) {
+                        throw new EmptyField("Item Name");
+                    }
+                    if (inputLastSeenAt.getText().isEmpty()) {
+                        throw new EmptyField("Last Seen At");
+                    }
+                    if (inputLastSeenOn.getText().isEmpty()) {
+                        throw new EmptyField("Last Seen On");
+                    }
+                    if (inputDescription.getText().isEmpty()) {
+                        throw new EmptyField("Description");
+                    }
+                    if (itemCategoryBox.getSelectedIndex() == 0) {
+                        JOptionPane.showMessageDialog(null, "Please select an item category");
+                        return;
+                    }
+
+                    //report as I found this item
+                    recordReport(user[0], "Found", inputLostItemName.getText(), inputLastSeenAt.getText(), inputLastSeenOn.getText(), inputDescription.getText(), itemCategoryBox.getSelectedIndex());
+
+                    int reportNum = getNextReportNumber() - 1;
+                    //validate success
+                    JOptionPane.showMessageDialog(null, "Found item reported successfully!");
+
+                    clearReportForm();
+
+                } catch (EmptyField ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
             }
         });
 
@@ -421,8 +967,8 @@ public class LFForm extends JFrame {
         logoutButton.setContentAreaFilled(false);
         logoutButton.setBorderPainted(false);
         itemsHolder.setLayout(new GridLayout(0, 2, 10, 10));
-
-        //Set up properties of certain fields beforehand
+        setUpItemCategoryBox(itemCategoryBox);
         scrolledItemsHolder.getVerticalScrollBar().setUnitIncrement(15); //n pixels per scroll [I'd suggest somewhere between 10-20 inclusive] works good in small - medium lists
+        scrollableDetails.getVerticalScrollBar().setUnitIncrement(15);
     }
 }
