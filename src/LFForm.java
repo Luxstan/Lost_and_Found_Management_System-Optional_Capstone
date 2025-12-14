@@ -344,14 +344,14 @@ public class LFForm extends JFrame {
         Color statusColor;
         if (data[6].equals("Found")) {
             statusMessage = "This item is missing its owner";
-            statusColor = Color.decode("#000000");
+            statusColor = Color.RED;
         } else {
             statusMessage = data[1] + " lost this item";
             statusColor = Color.RED;
         }
 
         JLabel statusLabel = new JLabel(statusMessage);
-        statusLabel.setFont(new Font("Arial", Font.ITALIC, 15));
+        statusLabel.setFont(new Font("Arial", Font.BOLD, 15));
         statusLabel.setForeground(statusColor);
         statusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         mainDetailsPanel.add(statusLabel);
