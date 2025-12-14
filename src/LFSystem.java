@@ -23,9 +23,6 @@ public class LFSystem {
         foundList = new ArrayList<>();
         historyList = new ArrayList<>();
         userList = new ArrayList<>();
-
-        createUser("fwae", "24-4941-979" , "fwae" , "09999999999" , "BSCpE" , 4);
-
     }
 
     //Methods
