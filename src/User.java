@@ -41,13 +41,13 @@ public class User {
     }
 
     public String outputItemName(String option){
-        String ret = "";
+        String ret = "<html>";
         int ctr = 1;
         if(option.equals("LOST")){
             for(Item a : lostList){
                 ret += ctr + ": " + a.getItemName() + " [" + a.getItemID() + "]";
                 if(ctr != lostList.size()){
-                    ret += "\n";
+                    ret += "<br>";
                 }
                 ctr++;
             }
@@ -55,11 +55,12 @@ public class User {
             for(Item a : foundList){
                 ret += ctr + ": " + a.getItemName() + " [" + a.getItemID() + "]";
                 if(ctr != foundList.size()){
-                    ret += "\n";
+                    ret += "<br>";
                 }
                 ctr++;
             }
         }
+        ret+= "</html>";
         return ret;
     }
     public void displayList(String option){

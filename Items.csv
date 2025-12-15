@@ -1,7 +1,10 @@
 1,fwae,a,a,a,a,Found,Money,1.png,a,Yes
 2,fwae,e,e,e,e,Lost,Clothing,2.png,e,e,e,e,e
-3,fwae,Money,Cafeteria,Table,It was a lot of money blue wallet,Lost,Money,N/A,500.00,Yes
-4,fwae,25 pesos,ergerg,regesg,esrgresg,Lost,Money,N/A,25.00,No
-5,fwae,test,ergerg,ergesrg,erg,Lost,Bag,N/A,N/A,N/A,N/A
-6,fwae,test2,ergergrg,esrgerg,esrgergerg,Lost,Bag,N/A,N/A,N/A,N/A
-7,fwae,ersgesrg,ersgersg,ersger,gesrgreg,Found,Clothing,N/A,N/A,N/A,N/A,N/A,N/A
+3,fwae,name,last seen at,last seen on,description,Lost,Accessory,N/A,color,material,type4,fwae,accessory,last seen at,last seen on,description,Lost,Accessory,N/A,N/A,N/A,N/A
+4,fwae,Bag,a,a,a,Lost,Bag,N/A,N/A,N/A,N/A
+5,fwae,Clothing,a,a,a,Lost,Clothing,N/A,N/A,N/A,N/A,N/A,N/A
+6,fwae,Document,a,a,a,Lost,Document,N/A,N/A,N/A,N/A
+7,fwae,Electronic,a,a,a,Lost,Electronic,N/A,N/A,N/A,N/A
+8,fwae,Food Container,a,a,a,Lost,Food Container,N/A,N/A,N/A,N/A,N/A
+9,fwae,Money,a,a,a,Lost,Money,N/A,10.00,No
+10,fwae,Tumbler,a,aa,a,Lost,Tumbler,N/A,N/A,N/A
