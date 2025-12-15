@@ -662,6 +662,7 @@
                         </constraints>
                         <properties>
                           <text value="Edit Information"/>
+                          <visible value="false"/>
                         </properties>
                       </component>
                       <hspacer id="4a57f">
