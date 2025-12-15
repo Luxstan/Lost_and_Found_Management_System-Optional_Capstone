@@ -195,8 +195,6 @@ public class LFForm extends JFrame {
         titleSelected.setText("Login");
         finalButton.setText("Login");
         redirectToOther.setText("Register?");
-
-        userProfilePicture.setIcon(new ImageIcon("assets/blank_pfp.png")); //256x256
     }
     public void goToRegister(){
         hideAll();
@@ -641,7 +639,7 @@ public class LFForm extends JFrame {
 
         //Displays the user's lost and found list
         userLostItem.setText(system.displayUserLostList());
-        System.out.println(system.displayUserLostList());
+        //System.out.println(system.displayUserLostList());
         userFounditem.setText(system.displayUserFoundList());
     }
 
@@ -650,6 +648,8 @@ public class LFForm extends JFrame {
         userName.setText("Username: " + system.current_user.getName());
         userContactNum.setText("Contact Number: " + system.current_user.getContactNo());
         userCourseYear.setText("Course and Year: " + system.current_user.getCourse() + "-" + system.current_user.getYear());
+
+        userProfilePicture.setIcon(new ImageIcon("assets/blank_pfp.png")); //256x256
     }
 
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
@@ -1321,9 +1321,9 @@ public class LFForm extends JFrame {
                             }
 
                             //Setting up the Constant Banner
-                            if(greetingsLabel.getText().equals("Change This")){
-                                greetingsLabel.setText("Welcome " + system.current_user.getName() + "! (" +  system.current_user.getId() + ")");
-                            }
+
+                            greetingsLabel.setText("Welcome " + system.current_user.getName() + "! (" +  system.current_user.getId() + ")");
+
                             break;
                         //REGISTERING NEW ACCOUNT
                         case "Register":
