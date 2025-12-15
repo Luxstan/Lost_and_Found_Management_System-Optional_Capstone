@@ -129,6 +129,7 @@ public class LFForm extends JFrame {
     private JScrollPane scrollableProfilePage;
     private JLabel userLostItem;
     private JLabel userFounditem;
+    private JLabel userProfilePicture;
     private String uploadedImageFileName = ""; // stores just the filename
 
     private JButton submitReportButton;
@@ -194,6 +195,8 @@ public class LFForm extends JFrame {
         titleSelected.setText("Login");
         finalButton.setText("Login");
         redirectToOther.setText("Register?");
+
+        userProfilePicture.setIcon(new ImageIcon("assets/blank_pfp.png")); //256x256
     }
     public void goToRegister(){
         hideAll();
