@@ -1510,7 +1510,7 @@ public class LFForm extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         logoIcon.setIcon(new ImageIcon("assets/cit_logo.png")); //300x212 dimensions
-        constantBanner.setIcon(new ImageIcon("assets/cit_logo.png"));
+        constantBanner.setIcon(new ImageIcon("assets/cit_banner.png"));
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
