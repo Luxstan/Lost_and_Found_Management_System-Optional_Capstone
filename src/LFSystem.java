@@ -227,10 +227,6 @@ public class LFSystem {
         return null;
     }
 
-    void handleReporting(){
-
-    }
-
     //TEST FOR THE SYSTEM'S PROCESS, u might be able to use code here and integrate it into the form!
     /* Bare with me, but I love documenting, so I'll explain the process, may be useful when integrating in your system.
         THE MAIN INTERFACE:
@@ -393,44 +389,70 @@ public class LFSystem {
             while ((curr = br.readLine()) != null) {
 
                 item_details = curr.split(",");
-                String category = item_details[7];
+                int category_index = 7;
+                String category = item_details[category_index];
+                System.out.println(category);
+                boolean category_valid = false;
                 Item a = null;
-                switch(category){
-                    case "Accessory":
-                        a = new Accessory();
-                        break;
-                    case "Bag":
-                        a = new Bag();
-                        break;
-                    case "Clothing":
-                        a = new Clothing();
-                        break;
-                    case "Document":
-                        a = new Document();
-                        break;
-                    case "Electronic":
-                        a = new Electronic();
-                        break;
-                    case "Food Container":
-                        a = new FoodContainer();
-                        break;
-                    case "Money":
-                        a = new Money();
-                        break;
-                    case "Tumbler":
-                        a = new Tumbler();
-                        break;
-                    case "Others":
-                        a = new Miscellaneous();
-                        break;
-                    default:
-                        System.out.println("FATAL ERROR IN ENCODE ITEM FROM FILE IN LFSYSTEM");
-                        break;
+                while(!category_valid){
+                    category_valid = true;
+                    switch(category){
+                        case "Accessory":
+                            a = new Accessory();
+                            System.out.println("Created Accessory Item");
+                            break;
+                        case "Bag":
+                            a = new Bag();
+                            System.out.println("Created Bag Item");
+                            break;
+                        case "Clothing":
+                            a = new Clothing();
+                            System.out.println("Created Clothing Item");
+                            break;
+                        case "Document":
+                            a = new Document();
+                            System.out.println("Created Document Item");
+                            break;
+                        case "Electronic":
+                            a = new Electronic();
+                            System.out.println("Created Electronic Item");
+                            break;
+                        case "Food Container":
+                            a = new FoodContainer();
+                            System.out.println("Created Food Container Item");
+                            break;
+                        case "Money":
+                            a = new Money();
+                            System.out.println("Created Money Item");
+                            break;
+                        case "Tumbler":
+                            a = new Tumbler();
+                            System.out.println("Created Tumbler Item");
+                            break;
+                        case "Others":
+                            a = new Miscellaneous();
+                            System.out.println("Created Others/Miscellaneous Item");
+                            break;
+                        default:
+                            category_valid = false;
+                            System.out.println("File Formatting error, checking if next comma split has Category");
+                            category = item_details[++category_index];
+                            break;
+                    }
                 }
+
                 if(a == null){
-                    System.out.println("FATAL ERROR. ITEM NOT CREATED!");
+                    System.out.println("ITEM IS DETECTED AS NULL. ITEM NOT CREATED!");
                     return;
                 }
+
+                //This one will try to align the item details if the description has a comma [quite unstable]
+                int ctr=0;
+                while(category_index != 7){
+                    category_index--;
+                    ctr++;
+                }
+
                 a.setItemName(item_details[2]);
                 a.setItemID(item_id);
                 a.setDetails(item_details[5]);
@@ -439,10 +461,10 @@ public class LFSystem {
 
                 for(User user : userList){
                     if(item_details[1].equals(user.getName())){ //Checks if the name equals to a name inside the userlist.
-                        if(item_details[6].equals("Lost")){ //Checks if the status is either Lost or Found
+                        if(item_details[6+ctr].equals("Lost")){ //Checks if the status is either Lost or Found
                             user.addLostItem(a);
                         }
-                        else if(item_details[6].equals("Found")){
+                        else if(item_details[6+ctr].equals("Found")){
                             user.addFoundItem(a);
                         }
                     }

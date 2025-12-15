@@ -641,7 +641,6 @@ public class LFForm extends JFrame {
 
         //Displays the user's lost and found list
         userLostItem.setText(system.displayUserLostList());
-        System.out.println(system.displayUserLostList());
         userFounditem.setText(system.displayUserFoundList());
     }
 
@@ -1511,7 +1510,7 @@ public class LFForm extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         logoIcon.setIcon(new ImageIcon("assets/cit_logo.png")); //300x212 dimensions
-        constantBanner.setIcon(new ImageIcon("assets/cit_logo.png")); //TODO get banner picture and change this
+        constantBanner.setIcon(new ImageIcon("assets/cit_logo.png"));
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
