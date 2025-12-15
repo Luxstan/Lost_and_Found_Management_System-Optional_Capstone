@@ -2,12 +2,11 @@ import ErrorPack.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.util.Objects;
+import java.awt.image.BufferedImage;
+import java.awt.FontMetrics;
 //for images
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.*;
@@ -641,6 +640,7 @@ public class LFForm extends JFrame {
 
         //Displays the user's lost and found list
         userLostItem.setText(system.displayUserLostList());
+        System.out.println(system.displayUserLostList());
         userFounditem.setText(system.displayUserFoundList());
     }
 
@@ -1261,6 +1261,88 @@ public class LFForm extends JFrame {
         });
     }
 
+    private void setupAdaptiveBanner() {
+        // Load the original image
+        ImageIcon originalIcon = new ImageIcon("assets/banner.png");
+        // Add component listener to the constant panel
+        constantPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int panelWidth = constantPanel.getWidth();
+                // Don't scale if panel isn't visible yet
+                if (panelWidth <= 10) return;
+                // Get original dimensions
+                int originalWidth = originalIcon.getIconWidth();
+                int originalHeight = originalIcon.getIconHeight();
+                // If image didn't load, skip
+                if (originalWidth <= 0 || originalHeight <= 0) return;
+                // Scale to fill panel width, maintain aspect ratio
+                double scale = (double) panelWidth / originalWidth;
+                int newWidth = panelWidth;
+                int newHeight = (int) (originalHeight * scale);
+
+                // Create a buffered image for the scaled image with text overlay
+                BufferedImage bufferedImage = new BufferedImage(
+                        newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = bufferedImage.createGraphics();
+
+                // Enable anti-aliasing for smooth text and image
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                        RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+                // Draw the scaled original image directly
+                g2d.drawImage(originalIcon.getImage(), 0, 0, newWidth, newHeight, null);
+
+                // Set font and color for text
+                g2d.setFont(new Font("Arial", Font.BOLD, 15));
+                g2d.setColor(Color.YELLOW);
+
+                // Split text into two lines
+                String line1 = "Cebu Institute of Technology";
+                String line2 = "University";
+
+                // Get font metrics to calculate text width
+                FontMetrics fm = g2d.getFontMetrics();
+                int text1Width = fm.stringWidth(line1);
+                int text2Width = fm.stringWidth(line2);
+                int lineHeight = fm.getHeight();
+
+                // Calculate center positions with 10px indent on sides
+                int x1 = (newWidth - text1Width) / 2;
+                int x2 = (newWidth - text2Width) / 2;
+                int y = (newHeight - lineHeight * 2) / 2 + fm.getAscent();
+
+                // Draw the text centered
+                g2d.drawString(line1, x1, y);
+                g2d.drawString(line2, x2, y + lineHeight);
+
+                g2d.dispose();
+
+                // Update the label with the new image
+                constantBanner.setIcon(new ImageIcon(bufferedImage));
+                constantBanner.setHorizontalAlignment(SwingConstants.CENTER);
+                constantBanner.setVerticalAlignment(SwingConstants.CENTER);
+                constantBanner.revalidate();
+                constantBanner.repaint();
+            }
+        });
+        // Force initial display after a short delay to ensure components are laid out
+        SwingUtilities.invokeLater(() -> {
+            Timer timer = new Timer(100, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    constantPanel.dispatchEvent(
+                            new ComponentEvent(constantPanel, ComponentEvent.COMPONENT_RESIZED));
+                    ((Timer)e.getSource()).stop();
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        });
+    }
+
 
     public LFForm() {
         //Encodes users from file
@@ -1510,7 +1592,7 @@ public class LFForm extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         logoIcon.setIcon(new ImageIcon("assets/cit_logo.png")); //300x212 dimensions
-        constantBanner.setIcon(new ImageIcon("assets/cit_banner.png"));
+        setupAdaptiveBanner();
         redirectToOther.setOpaque(false);
         redirectToOther.setContentAreaFilled(false);
         redirectToOther.setBorderPainted(false);
