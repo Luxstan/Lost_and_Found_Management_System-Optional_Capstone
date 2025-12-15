@@ -1296,8 +1296,8 @@ public class LFForm extends JFrame {
                 g2d.drawImage(originalIcon.getImage(), 0, 0, newWidth, newHeight, null);
 
                 // Set font and color for text
-                g2d.setFont(new Font("Arial", Font.BOLD, 15));
-                g2d.setColor(Color.YELLOW);
+                g2d.setFont(new Font("Arial", Font.BOLD, 18));
+                g2d.setColor(Color.decode("#800000"));
 
                 // Split text into two lines
                 String line1 = "Cebu Institute of Technology";
