@@ -5,7 +5,7 @@ public class Item {
     private String itemName;
     private String details = "-";
     private String lastLocationSeen;
-    private String foundBy;
+    private String reportedBy;
     private boolean isClaimed;
     private boolean isFound;
 
@@ -15,7 +15,7 @@ public class Item {
     }
 
     public void found(String name){
-        foundBy = name;
+        reportedBy = name;
         isFound = true;
     }
 
@@ -32,7 +32,7 @@ public class Item {
     public void setLastLocationSeen(String lastLocationSeen){
         this.lastLocationSeen = lastLocationSeen;
     }
-    public void setFoundBy(String foundBy){this.foundBy = foundBy;}
+    public void setFoundBy(String foundBy){this.reportedBy = foundBy;}
 
     public int getItemID(){
         return itemID;
@@ -50,7 +50,7 @@ public class Item {
     }
 
     public String getFoundBy() {
-        return foundBy;
+        return reportedBy;
     }
 
     public boolean isClaimed() {

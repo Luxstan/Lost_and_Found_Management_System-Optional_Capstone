@@ -26,10 +26,6 @@ public class LFSystem {
     }
 
     //Methods
-    /*public void addLostItem(Item a){}
-    public void addFoundItem(Item a){}
-    public void searchItem(Item a){}*/
-
     public void createUser(String name, String id, String pass, String contactNo, String course, int year){
         //First looks if it is not a duplicate. Returns and does nothing if it is a dupe.
         for(User a : userList){
@@ -390,6 +386,70 @@ public class LFSystem {
         }
     }
 
+    public void encodeItemsFromFile(){
+        String[] item_details;
+        String curr;
+        try (BufferedReader br = new BufferedReader(new FileReader("Items.csv"))) {
+            while ((curr = br.readLine()) != null) {
+
+                item_details = curr.split(",");
+                String category = item_details[7];
+                Item a = null;
+                switch(category){
+                    case "Accessory":
+                        a = new Accessory();
+                        break;
+                    case "Bag":
+                        a = new Bag();
+                        break;
+                    case "Clothing":
+                        a = new Clothing();
+                        break;
+                    case "Document":
+                        a = new Document();
+                        break;
+                    case "Electronic":
+                        a = new Electronic();
+                        break;
+                    case "Food Container":
+                        a = new FoodContainer();
+                        break;
+                    case "Money":
+                        a = new Money();
+                        break;
+                    case "Tumbler":
+                        a = new Tumbler();
+                        break;
+                    case "Others":
+                        a = new Miscellaneous();
+                        break;
+                    default:
+                        System.out.println("FATAL ERROR IN ENCODE ITEM FROM FILE IN LFSYSTEM");
+                        break;
+                }
+                if(a == null){
+                    System.out.println("FATAL ERROR. ITEM NOT CREATED!");
+                    return;
+                }
+                a.setItemName(item_details[2]);
+                a.setItemID(item_id);
+                a.setDetails(item_details[5]);
+                a.setLastLocationSeen(item_details[3]);
+                item_id++;
+
+                for(User user : userList){
+                    if(item_details[1].equals(user.getName())){ //Checks if the name equals to a name inside the userlist.
+                        if(item_details[6].equals("Lost")){ //Checks if the status is either Lost or Found
+                            user.addLostItem(a);
+                        }
+                        else if(item_details[6].equals("Found")){
+                            user.addFoundItem(a);
+                        }
+                    }
+                }
+            }
+        } catch (IOException ignored) {}
+    }
     public void encodeUsersFromFile(){ //This method creates [new] users based from the csv file. Acts like a "load".
         String[] user_details;
         String curr;
@@ -415,7 +475,7 @@ public class LFSystem {
     }
 
     public void createItem(String status, String item_name, String details, String lastSeenAt, String reportedBy, int category){
-        System.out.println(category);
+        //System.out.println(category);
         /*
         There are 0-9 Categories in the combo box
         Accessory
@@ -445,7 +505,7 @@ public class LFSystem {
             case 7:
                 a = new Money();
             case 8:
-                a = new FoodContainer();
+                a = new Tumbler();
             case 9:
                 a = new Miscellaneous();
             default:
@@ -455,18 +515,19 @@ public class LFSystem {
             System.out.println("ERROR. ITEM IS NULL.");
             return;
         }
-        a.setItemID(item_id);
+        a.setItemID(item_id++);
         a.setItemName(item_name);
         a.setDetails(details);
         a.setLastLocationSeen(lastSeenAt);
+        a.setFoundBy(reportedBy);
+
+        //Adds the lost item to the user's lost inventory list
         if(status.equals("Lost")){
             current_user.addLostItem(a);
         }
+        //Adds the found item to the user's found inventory list
         else if(status.equals("Found")){
-            a.setFoundBy(reportedBy);
             current_user.addFoundItem(a);
         }
-
-
     }
 }

@@ -649,7 +649,6 @@ public class LFForm extends JFrame {
         userCourseYear.setText("Course and Year: " + system.current_user.getCourse() + "-" + system.current_user.getYear());
     }
 
-
     //Find user's account through inputted username/studentID if it exists and return password to be used in validating
     //CSV format: username,password,IDNumber,contactNumber,courseAndYear
     //indices:      [0]      [1]       [2]        [3]          [4]
@@ -1262,6 +1261,12 @@ public class LFForm extends JFrame {
 
 
     public LFForm() {
+        //Encodes users from file
+        system.encodeUsersFromFile();
+
+        //Encodes items from file
+        system.encodeItemsFromFile();
+
         //add functionality to buttons
         redirectToOther.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1484,8 +1489,6 @@ public class LFForm extends JFrame {
             }
         });
 
-        //Encodes users from file
-        system.encodeUsersFromFile();
         backButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 goToLostItems(user, lostItemsButton, reportAnItemButton, profileButton, itemsHolder);

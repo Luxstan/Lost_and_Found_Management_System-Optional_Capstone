@@ -1,5 +1,6 @@
 package ItemPack;
 
+//DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED
 public class WearableElectronic extends Electronic implements Wearable{
 
     public WearableElectronic(String model, String brand, String material, String type, String color){
